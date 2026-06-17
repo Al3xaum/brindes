@@ -256,6 +256,8 @@
     }
 
 async function pushDataToCloud() {
+    const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
+        console.log("Tentando acessar a URL:", urlFinal);
     try {
         const response = await fetch(`${SUPABASE_URL}site_config`, {
             method: "POST", // POST com upsert é o segredo
