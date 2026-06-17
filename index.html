@@ -218,7 +218,8 @@
             };
             giftProducts = [];
         }
-  const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co"; 
+  const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co/rest/v1/""; 
+  
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bGhneXd3bGViaXltcGJ4ZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTk1OTYsImV4cCI6MjA5NzI5NTU5Nn0.UBnbZ5WUkfZ0koz-XgqJNAgcg59t3Hztax0rTTk9mnQ";
 
   
@@ -230,8 +231,10 @@
 
     // 3. FUNÇÃO DE CARGA ATUALIZADA (Supabase)
     async function loadDataFromCloud() {
+        const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
+        console.log("Tentando acessar a URL:", urlFinal);
         try {
-           const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+           const response = await fetch(`${SUPABASE_URL}site_config?id=eq.1`, {
             headers: { 
                 "apikey": SUPABASE_KEY,
                 "Accept": "application/json"
@@ -254,7 +257,7 @@
 
 async function pushDataToCloud() {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
+        const response = await fetch(`${SUPABASE_URL}site_config`, {
             method: "POST", // POST com upsert é o segredo
             headers: { 
                 "apikey": SUPABASE_KEY,
