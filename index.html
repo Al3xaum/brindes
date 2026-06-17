@@ -267,18 +267,18 @@
     // Atualiza a tela após tentar carregar
     updateFrontend();
 }
-
 async function pushDataToCloud() {
-    const url = `${SUPABASE_URL}site_config`;
-    
+    // LOG DE SEGURANÇA: Veja o que está a ser enviado
+    console.log("Dados a enviar:", { site_data: siteData, gift_products: giftProducts });
+
     try {
-        const response = await fetch(url, {
-            method: "POST", // Usamos POST para upsert
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
+            method: "POST",
             headers: { 
                 "apikey": SUPABASE_KEY,
                 "Authorization": `Bearer ${SUPABASE_KEY}`,
                 "Content-Type": "application/json",
-                "Prefer": "return=minimal, resolution=merge-duplicates" // Importante!
+                "Prefer": "return=minimal, resolution=merge-duplicates"
             },
             body: JSON.stringify({ 
                 id: 1, 
@@ -287,15 +287,10 @@ async function pushDataToCloud() {
             })
         });
 
-        if (response.ok) {
-            showToast("✅ Salvo com sucesso!");
-        } else {
-            const err = await response.text();
-            console.error("Erro ao salvar:", err);
-            showToast("❌ Erro ao salvar", "error");
-        }
+        // Verifique o status com atenção
+        console.log("Resposta do Supabase:", response.status);
     } catch (error) {
-        console.error("Erro de conexão:", error);
+        console.error("Erro:", error);
     }
 }
 
