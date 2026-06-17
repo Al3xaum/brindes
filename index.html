@@ -199,7 +199,8 @@
         // CONFIGURAÇÃO DO COFRE DE DADOS (GRATUITO E NATIVO)
         // ==========================================
         // Cole aqui o link que você pegou no site kvdb.io:
-       const DB_URL = "/api/save-data";
+      const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co"; 
+const SUPABASE_KEY = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bGhneXd3bGViaXltcGJ4ZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTk1OTYsImV4cCI6MjA5NzI5NTU5Nn0";
         let currentGiftsSlide = 0;
         let giftProducts = [];
         let siteData = {};
@@ -222,32 +223,35 @@
         // A função de carga agora aponta para a sua função do Netlify
 async function loadDataFromCloud() {
     try {
-        const response = await fetch('/api/save-data');
-        if (!response.ok) throw new Error("Erro ao buscar dados");
-        
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        });
         const data = await response.json();
-        siteData = data.siteData;
-        giftProducts = data.giftProducts || [];
+        if (data.length > 0) {
+            siteData = data[0].site_data;
+            giftProducts = data[0].gift_products;
+            updateFrontend();
+        }
     } catch (error) {
-        console.warn("Usando dados padrão.");
-        loadFallbacks();
+        console.error("Erro ao carregar do Supabase", error);
     }
-    updateFrontend();
 }
 
-// A função de salvamento agora aponta para a sua função do Netlify
 async function pushDataToCloud() {
     try {
-        const response = await fetch('/api/save-data', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ siteData, giftProducts })
+        await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+            method: "PATCH", // Atualiza os dados existentes
+            headers: { 
+                "apikey": SUPABASE_KEY, 
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal"
+            },
+            body: JSON.stringify({ site_data: siteData, gift_products: giftProducts })
         });
-        
-        if(!response.ok) throw new Error("Falha na gravação");
-        showToast("☁️ Guardado com sucesso no Servidor!");
+        showToast("✅ Salvo com sucesso no Supabase!");
     } catch (error) {
-        showToast("❌ Erro ao guardar na nuvem.", "error");
+        showToast("❌ Erro ao salvar", "error");
     }
 }
 
