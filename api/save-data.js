@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const DB_URL = "https://kvdb.io/5KY85PYA2XF2WqsHnN2isV/site_data";
+  const DB_URL = "https://kvdb.io/XZWZXe2hqonabBMXYhWFDd/";
 
   // Busca dados (GET)
   if (req.method === 'GET') {
