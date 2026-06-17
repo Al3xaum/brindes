@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilson Gomes - Brindes Personalizados 3D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #ffffff; color: #1f2937; }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .carousel-container { position: relative; overflow: hidden; border-radius: 12px; background: #f3f4f6; }
+        .carousel-item { display: none; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .carousel-item.active { display: flex; align-items: center; justify-content: center; opacity: 1; }
+        .carousel-item img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto; }
+        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; cursor: pointer; transition: all 0.3s ease; }
+        .dot.active { background: #667eea; width: 24px; border-radius: 5px; }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.4); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; }
+        .carousel-btn:hover { background: rgba(0, 0, 0, 0.7); }
+        .carousel-btn.prev { left: 16px; }
+        .carousel-btn.next { right: 16px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+        .form-input, .form-textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-textarea { resize: vertical; min-height: 100px; font-family: inherit; }
+        .btn { padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: #e5e7eb; color: #1f2937; }
+        .btn-danger { background: #ef4444; color: white; }
+        .admin-badge { position: fixed; bottom: 16px; right: 16px; z-index: 100; }
+        .admin-btn { width: 50px; height: 50px; border-radius: 50%; background: #1f2937; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        .admin-panel { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1); z-index: 2000; overflow-y: auto; padding: 24px; }
+        .admin-panel.open { display: block; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 16px 24px; border-radius: 8px; z-index: 2001; opacity: 0; animation: slideUp 0.3s ease forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @media (max-width: 640px) { .admin-panel { width: 100%; } }
+        .img-placeholder { width: 100%; height: 100%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+        .info-box { background: #f3f4f6; border-left: 4px solid #667eea; padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; }
+        .tip-box { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 6px; font-size: 12px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">Nilson Gomes</h1>
+            <nav class="hidden sm:flex gap-8">
+                <a href="#sobre" class="text-gray-700 hover:text-indigo-600">Sobre</a>
+                <a href="#brindes" class="text-gray-700 hover:text-indigo-600">Brindes</a>
+                <a href="#contato" class="text-gray-700 hover:text-indigo-600">Contato</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-gradient py-20 text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-5xl font-bold mb-6">Brindes Personalizados 3D</h2>
+            <p id="hero-description" class="text-xl mb-8 opacity-90">A carregar conteúdo...</p>
+            <div class="flex gap-4 justify-center">
+                <a href="#brindes" class="btn btn-primary">Ver Portfólio</a>
+                <a href="#contato" class="btn btn-secondary">Solicitar Orçamento</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="sobre" class="py-20 max-w-6xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="p-8 bg-gray-50 rounded-lg">
+                <div class="text-4xl mb-4">🎨</div>
+                <h4 class="text-xl font-bold mb-3">Design Personalizado</h4>
+                <p id="about-design" class="text-gray-700">A carregar...</p>
+            </div>
+            <div class="p-8 bg-gray-50 rounded-lg">
+                <div class="text-4xl mb-4">⭐</div>
+                <h4 class="text-xl font-bold mb-3">Qualidade Premium</h4>
+                <p id="about-quality" class="text-gray-700">A carregar...</p>
+            </div>
+            <div class="p-8 bg-gray-50 rounded-lg">
+                <div class="text-4xl mb-4">🚀</div>
+                <h4 class="text-xl font-bold mb-3">Entrega Rápida</h4>
+                <p id="about-delivery" class="text-gray-700">A carregar...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="brindes" class="py-20 bg-gray-50">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-2">
+                <div class="carousel-container" style="height: 450px;">
+                    <div id="gifts-carousel-container" style="width:100%; height:100%;"></div>
+                    <button class="carousel-btn prev" onclick="prevSlide()">❮</button>
+                    <button class="carousel-btn next" onclick="nextSlide()">❯</button>
+                </div>
+                <div class="carousel-dots" id="gifts-carousel-dots"></div>
+                <div class="text-center p-6 bg-white mt-2 rounded">
+                    <p class="text-lg font-bold" id="gifts-carousel-name"></p>
+                    <p class="text-sm text-gray-600" id="gifts-carousel-desc"></p>
+                    <span id="gifts-carousel-counter" class="text-xs text-gray-400 block mt-2"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="py-20 text-center">
+        <h3 class="text-3xl font-bold mb-8">Vamos Criar Algo Especial?</h3>
+        <div class="flex gap-4 justify-center">
+            <button class="btn btn-primary" onclick="openContactModal()">Solicitar Orçamento</button>
+            <a id="whatsapp-link-btn" href="#" target="_blank" class="btn btn-secondary">WhatsApp</a>
+        </div>
+    </section>
+
+    <div class="admin-badge">
+        <button class="admin-btn" onclick="toggleAdminPanel()">⚙️</button>
+    </div>
+
+    <div class="admin-panel" id="admin-panel">
+        <div class="admin-header">
+            <h2 class="text-xl font-bold">Painel de Administração</h2>
+            <button onclick="toggleAdminPanel()">✕</button>
+        </div>
+
+        <div id="admin-login">
+            <div class="form-group">
+                <label class="form-label">Senha Admin</label>
+                <input type="password" id="admin-password" class="form-input" placeholder="admin123">
+            </div>
+            <button class="btn btn-primary w-full" onclick="loginAdmin()">Entrar</button>
+        </div>
+
+        <div id="admin-area" style="display:none;">
+            <div class="info-box">☁️ Ligado ao cofre seguro e independente de banco de dados. As alterações agora funcionam!</div>
+            
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold mb-2">Hero Texto</h4>
+                <textarea id="hero-desc-input" class="form-textarea"></textarea>
+                <button class="btn btn-primary w-full mt-2" onclick="saveHeroContent()">Salvar Hero</button>
+            </div>
+
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold mb-2">Seções Sobre</h4>
+                <input type="text" id="about-design-input" class="form-input mb-2" placeholder="Design">
+                <input type="text" id="about-quality-input" class="form-input mb-2" placeholder="Qualidade">
+                <input type="text" id="about-delivery-input" class="form-input mb-2" placeholder="Entrega">
+                <button class="btn btn-primary w-full" onclick="saveAboutContent()">Salvar Sobre</button>
+            </div>
+
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold mb-2">Adicionar Brinde</h4>
+                <div class="form-group">
+                    <label class="form-label">Cole o link (URL) direto da imagem</label>
+                    <input type="text" id="gift-url-input" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+                    <div class="tip-box">
+                        💡 <strong>Dica:</strong> Copie o "Endereço da imagem" (precisa terminar em .jpg, .png).
+                    </div>
+                </div>
+                <input type="text" id="gift-name-input" class="form-input mb-2" placeholder="Nome do brinde">
+                <input type="text" id="gift-desc-input" class="form-input mb-2" placeholder="Descrição curta">
+                <button class="btn btn-primary w-full" onclick="addGift()">Adicionar ao Carrossel</button>
+                <div id="gifts-list" class="mt-4 space-y-2"></div>
+            </div>
+
+            <div>
+                <h4 class="font-bold mb-2">Contacto</h4>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp (Apenas números com DDD)</label>
+                    <input type="text" id="whatsapp-input" class="form-input mb-2" placeholder="Ex: 5511999999999">
+                </div>
+                <button class="btn btn-primary w-full" onclick="saveContactData()">Salvar Contacto</button>
+            </div>
+            
+            <button class="btn btn-danger w-full mt-6 text-xs" onclick="resetAllData()">⚠️ Resetar Tudo</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contact-modal">
+        <div class="modal">
+            <h3 class="text-xl font-bold mb-4">Orçamento</h3>
+            <form onsubmit="handleContactSubmit(event)">
+                <input type="text" id="contact-name" class="form-input mb-3" placeholder="Seu Nome" required>
+                <textarea id="contact-message" class="form-textarea mb-3" placeholder="O que deseja encomendar?" required></textarea>
+                <div class="flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-1">Enviar para WhatsApp</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURAÇÃO DO COFRE DE DADOS (GRATUITO E NATIVO)
+        // ==========================================
+        // Cole aqui o link que você pegou no site kvdb.io:
+       const DB_URL = "/.netlify/functions/save-data";
+        let currentGiftsSlide = 0;
+        let giftProducts = [];
+        let siteData = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromCloud();
+        });
+
+        function loadFallbacks() {
+            siteData = {
+                heroDescription: "Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.",
+                aboutDesign: "Design exclusivo para a sua marca.",
+                aboutQuality: "Qualidade garantida em cada peça.",
+                aboutDelivery: "Entregas rápidas e seguras.",
+                whatsapp: "5511999999999"
+            };
+            giftProducts = [];
+        }
+
+        // A função de carga agora aponta para a sua função do Netlify
+async function loadDataFromCloud() {
+    try {
+        const response = await fetch('/.netlify/functions/save-data');
+        if (!response.ok) throw new Error("Erro ao buscar dados");
+        
+        const data = await response.json();
+        siteData = data.siteData;
+        giftProducts = data.giftProducts || [];
+    } catch (error) {
+        console.warn("Usando dados padrão.");
+        loadFallbacks();
+    }
+    updateFrontend();
+}
+
+// A função de salvamento agora aponta para a sua função do Netlify
+async function pushDataToCloud() {
+    try {
+        const response = await fetch('/.netlify/functions/save-data', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ siteData, giftProducts })
+        });
+        
+        if(!response.ok) throw new Error("Falha na gravação");
+        showToast("☁️ Guardado com sucesso no Netlify!");
+    } catch (error) {
+        showToast("❌ Erro ao guardar na nuvem.", "error");
+    }
+}
+
+        function updateFrontend() {
+            document.getElementById('hero-description').textContent = siteData.heroDescription || 'Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.';
+            document.getElementById('about-design').textContent = siteData.aboutDesign || 'Design exclusivo para a sua marca.';
+            document.getElementById('about-quality').textContent = siteData.aboutQuality || 'Qualidade garantida em cada peça.';
+            document.getElementById('about-delivery').textContent = siteData.aboutDelivery || 'Entregas rápidas e seguras.';
+            document.getElementById('whatsapp-link-btn').href = `https://wa.me/${siteData.whatsapp || '5511999999999'}`;
+            renderGiftsCarousel();
+        }
+
+        function loginAdmin() {
+            if (document.getElementById('admin-password').value === 'admin123') {
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-area').style.display = 'block';
+                document.getElementById('hero-desc-input').value = siteData.heroDescription || '';
+                document.getElementById('about-design-input').value = siteData.aboutDesign || '';
+                document.getElementById('about-quality-input').value = siteData.aboutQuality || '';
+                document.getElementById('about-delivery-input').value = siteData.aboutDelivery || '';
+                document.getElementById('whatsapp-input').value = siteData.whatsapp || '';
+                renderGiftsList();
+            } else {
+                showToast('Senha Incorreta', 'error');
+            }
+        }
+
+        function saveHeroContent() { siteData.heroDescription = document.getElementById('hero-desc-input').value; updateFrontend(); pushDataToCloud(); }
+        
+        function saveAboutContent() { 
+            siteData.aboutDesign = document.getElementById('about-design-input').value;
+            siteData.aboutQuality = document.getElementById('about-quality-input').value;
+            siteData.aboutDelivery = document.getElementById('about-delivery-input').value;
+            updateFrontend(); pushDataToCloud(); 
+        }
+
+        function saveContactData() { 
+            siteData.whatsapp = document.getElementById('whatsapp-input').value; 
+            updateFrontend(); pushDataToCloud(); 
+        }
+
+        function addGift() {
+            const name = document.getElementById('gift-name-input').value.trim();
+            const desc = document.getElementById('gift-desc-input').value.trim();
+            let url = document.getElementById('gift-url-input').value.trim();
+            
+            if(!name || !url) { showToast("Nome e URL da imagem são obrigatórios", "error"); return; }
+            
+            // Corrige se a pessoa copiar um link do imgur de forma errada
+            if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
+                url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
+            }
+
+            giftProducts.push({ id: Date.now(), name, desc, image: url });
+            document.getElementById('gift-name-input').value = '';
+            document.getElementById('gift-desc-input').value = '';
+            document.getElementById('gift-url-input').value = '';
+            renderGiftsCarousel(); renderGiftsList(); pushDataToCloud();
+        }
+
+        function removeGift(id) { giftProducts = giftProducts.filter(g => g.id !== id); renderGiftsCarousel(); renderGiftsList(); pushDataToCloud(); }
+
+        function renderGiftsList() {
+            const container = document.getElementById('gifts-list'); container.innerHTML = '';
+            giftProducts.forEach(g => {
+                container.innerHTML += `<div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm"><span>${g.name}</span><button class="text-red-500 font-bold" onclick="removeGift(${g.id})">✕</button></div>`;
+            });
+        }
+
+        function renderGiftsCarousel() {
+            const container = document.getElementById('gifts-carousel-container'); container.innerHTML = '';
+            if(!giftProducts.length) { container.innerHTML = '<div class="img-placeholder">Nenhum brinde no portfólio.</div>'; return; }
+            
+            giftProducts.forEach((g, idx) => {
+                container.innerHTML += `
+                    <div class="carousel-item ${idx === currentGiftsSlide ? 'active' : ''}">
+                        <img src="${g.image}" onerror="this.onerror=null; this.src='https://placehold.co/600x450/e5e7eb/a3a3a3?text=Erro+de+Link';">
+                    </div>`;
+            });
+            
+            const dots = document.getElementById('gifts-carousel-dots'); dots.innerHTML = '';
+            giftProducts.forEach((_, idx) => {
+                dots.innerHTML += `<button class="dot ${idx === currentGiftsSlide ? 'active' : ''}" onclick="goToSlide(${idx})"></button>`;
+            });
+            
+            const active = giftProducts[currentGiftsSlide];
+            if(active) {
+                document.getElementById('gifts-carousel-name').textContent = active.name;
+                document.getElementById('gifts-carousel-desc').textContent = active.desc || '';
+            }
+            document.getElementById('gifts-carousel-counter').textContent = `Produto ${currentGiftsSlide + 1} de ${giftProducts.length}`;
+        }
+
+        function nextSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide + 1) % giftProducts.length; renderGiftsCarousel(); } }
+        function prevSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide - 1 + giftProducts.length) % giftProducts.length; renderGiftsCarousel(); } }
+        function goToSlide(i) { currentGiftsSlide = i; renderGiftsCarousel(); }
+        
+        function openContactModal() { document.getElementById('contact-modal').classList.add('active'); }
+        function closeContactModal() { document.getElementById('contact-modal').classList.remove('active'); }
+        
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value;
+            const msg = document.getElementById('contact-message').value;
+            window.open(`https://wa.me/${siteData.whatsapp || '5511999999999'}?text=${encodeURIComponent(`Olá, sou o ${name}. ${msg}`)}`, '_blank');
+            closeContactModal();
+        }
+
+        function toggleAdminPanel() { document.getElementById('admin-panel').classList.toggle('open'); }
+        function resetAllData() { if (confirm('⚠️ Deletar em definitivo todos os dados da nuvem?')) { loadFallbacks(); updateFrontend(); pushDataToCloud(); } }
+        function showToast(m, type="success") { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; if(type==="error") t.style.background = '#ef4444'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    </script>
+</body>
+</html>
