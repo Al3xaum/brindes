@@ -1,21 +1,28 @@
-import { getStore } from "@netlify/blobs";
+export default async function handler(req, res) {
+  const DB_URL = "https://kvdb.io/5KY85PYA2XF2WqsHnN2isV/site_data";
 
-export const handler = async (event) => {
-  // Vamos buscar as credenciais que o Netlify fornece automaticamente
-  const store = getStore({ 
-    name: "nilson_brindes_store",
-    siteID: process.env.SITE_ID,
-    token: process.env.NETLIFY_API_TOKEN // Use a variável que você criou
-  });
-  // O restante do código permanece igual
-  if (event.httpMethod === "GET") {
-    const data = await store.get("site_state", { type: "json" });
-    return { statusCode: 200, body: JSON.stringify(data || {}) };
+  // Busca dados (GET)
+  if (req.method === 'GET') {
+    try {
+      const response = await fetch(DB_URL);
+      const data = await response.json();
+      return res.status(200).json(data);
+    } catch (e) {
+      return res.status(200).json({ siteData: {}, giftProducts: [] });
+    }
   }
 
-  if (event.httpMethod === "POST") {
-    const body = JSON.parse(event.body);
-    await store.setJSON("site_state", body);
-    return { statusCode: 200, body: JSON.stringify({ message: "Salvo!" }) };
+  // Salva dados (POST)
+  if (req.method === 'POST') {
+    try {
+      await fetch(DB_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req.body)
+      });
+      return res.status(200).json({ message: "Guardado com sucesso!" });
+    } catch (e) {
+      return res.status(500).json({ error: "Erro ao salvar" });
+    }
   }
-};
+}
