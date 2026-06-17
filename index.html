@@ -230,54 +230,69 @@
     });
 
     // 3. FUNÇÃO DE CARGA ATUALIZADA (Supabase)
-    async function loadDataFromCloud() {
-        const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
-        console.log("Tentando acessar a URL:", urlFinal);
-        try {
-           const response = await fetch(`${SUPABASE_URL}site_config?id=eq.1`, {
+   async function loadDataFromCloud() {
+    // Usando a mesma URL base e o mesmo caminho que o push
+    const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
+    
+    try {
+        const response = await fetch(urlFinal, {
+            method: "GET", // Explicitamente um GET para buscar
             headers: { 
                 "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
                 "Accept": "application/json"
             }
         });
+
+        if (!response.ok) {
+            throw new Error(`Erro ${response.status}: ${response.statusText}`);
+        }
+
         const data = await response.json();
             
-            if (data && data.length > 0) {
-                siteData = data[0].site_data;
-                giftProducts = data[0].gift_products || [];
-            } else {
-                loadFallbacks(); // Dados não existem, carrega padrão
-            }
-        } catch (error) {
-            console.error("Erro ao carregar:", error);
-            loadFallbacks();
+        // Se o Supabase encontrar a linha, os dados estarão no array
+        if (data && data.length > 0) {
+            siteData = data[0].site_data;
+            giftProducts = data[0].gift_products || [];
+            console.log("Dados carregados do Supabase com sucesso!");
+        } else {
+            console.log("Nenhum dado encontrado, carregando valores padrão.");
+            loadFallbacks(); 
         }
-        updateFrontend();
+    } catch (error) {
+        console.error("Erro ao carregar do Supabase:", error);
+        loadFallbacks(); // Em caso de erro, mantém o site funcional com padrões
     }
+    
+    // Atualiza a tela após tentar carregar
+    updateFrontend();
+}
 
 async function pushDataToCloud() {
-    const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
-        console.log("Tentando acessar a URL:", urlFinal);
+    const url = `${SUPABASE_URL}/rest/v1/site_config`;
+    
     try {
-        const response = await fetch(`${SUPABASE_URL}site_config`, {
-            method: "POST", // POST com upsert é o segredo
+        const response = await fetch(url, {
+            method: "POST", // Usamos POST para upsert
             headers: { 
                 "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
                 "Content-Type": "application/json",
-                "Prefer": "return=minimal, resolution=merge-duplicates" // Isso é o "UPSERT"
+                "Prefer": "return=minimal, resolution=merge-duplicates" // Importante!
             },
             body: JSON.stringify({ 
-                id: 1, // Forçamos o ID 1 para garantir que sempre atualize a mesma linha
+                id: 1, 
                 site_data: siteData, 
                 gift_products: giftProducts 
             })
         });
 
-        if (response.ok || response.status === 201 || response.status === 204) {
+        if (response.ok) {
             showToast("✅ Salvo com sucesso!");
         } else {
-            const error = await response.json();
-            console.error("Erro:", error);
+            const err = await response.text();
+            console.error("Erro ao salvar:", err);
+            showToast("❌ Erro ao salvar", "error");
         }
     } catch (error) {
         console.error("Erro de conexão:", error);
