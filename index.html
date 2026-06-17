@@ -221,35 +221,48 @@
   const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bGhneXd3bGViaXltcGJ4ZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTk1OTYsImV4cCI6MjA5NzI5NTU5Nn0.UBnbZ5WUkfZ0koz-XgqJNAgcg59t3Hztax0rTTk9mnQ";
 
-         
-        // A função de carga agora aponta para a sua função do Netlify
-async function loadDataFromCloud() {
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
-            headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  
+
+    // 2. ISSO CHAMA OS DADOS ASSIM QUE A PÁGINA ABRE
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDataFromCloud();
+    });
+
+    // 3. FUNÇÃO DE CARGA ATUALIZADA (Supabase)
+    async function loadDataFromCloud() {
+        try {
+           const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+            headers: { 
+                "apikey": SUPABASE_KEY,
+                "Accept": "application/json"
+            }
         });
         const data = await response.json();
-        if (data.length > 0) {
-            siteData = data[0].site_data;
-            giftProducts = data[0].gift_products;
-            updateFrontend();
+            
+            if (data && data.length > 0) {
+                siteData = data[0].site_data;
+                giftProducts = data[0].gift_products || [];
+            } else {
+                loadFallbacks(); // Dados não existem, carrega padrão
+            }
+        } catch (error) {
+            console.error("Erro ao carregar:", error);
+            loadFallbacks();
         }
-    } catch (error) {
-        console.error("Erro ao carregar do Supabase", error);
+        updateFrontend();
     }
-}
 
 async function pushDataToCloud() {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+       const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
             method: "PATCH",
             headers: { 
-                "apikey": SUPABASE_KEY, // Nome da chave tem de ser minúsculo
-                "Authorization": `Bearer ${SUPABASE_KEY}`, // Note o espaço após Bearer
+                "apikey": SUPABASE_KEY, // Apenas este header é necessário
                 "Content-Type": "application/json",
                 "Prefer": "return=minimal"
             },
             body: JSON.stringify({ site_data: siteData, gift_products: giftProducts })
+        });
         });
 
         if (!response.ok) {
