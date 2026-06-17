@@ -263,7 +263,7 @@ async function pushDataToCloud() {
             },
             body: JSON.stringify({ site_data: siteData, gift_products: giftProducts })
         });
-        });
+        
 
         if (!response.ok) {
             const error = await response.json();
