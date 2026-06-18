@@ -298,9 +298,8 @@ if (data && data.length > 0) {
     } else {
         giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
     }
-} else {
-    giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
-}
+    
+
             console.log("Dados carregados do Supabase com sucesso!");
         } else {
             console.log("Nenhum dado encontrado, carregando valores padrão.");
