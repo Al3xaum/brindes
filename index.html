@@ -14,12 +14,15 @@
         .carousel-container { position: relative; overflow: hidden; border-radius: 12px; background: #f3f4f6; }
         .carousel-item { display: none; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .carousel-item.active { display: flex; align-items: center; justify-content: center; opacity: 1; }
-        .carousel-item img {
+       .carousel-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Isso corta a imagem para preencher sem distorcer */
-    /* Se preferir que ela apareça inteira sem cortar, use: object-fit: contain; */
-    border-radius: 8px;
+    /* 'contain' garante que a imagem inteira apareça, mantendo a proporção original */
+    object-fit: contain; 
+    display: block;
+    margin: 0 auto;
+    background-color: #f3f4f6; /* Preenche o espaço vazio ao redor com a cor do container */
+}
 }
         .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; cursor: pointer; transition: all 0.3s ease; }
