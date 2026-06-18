@@ -91,22 +91,44 @@
         </div>
     </section>
 
-    <section id="brindes" class="py-20 bg-gray-50">
-        <div class="max-w-3xl mx-auto px-4">
-            <div class="bg-gray-100 rounded-lg overflow-hidden shadow-lg p-2">
-                <div class="carousel-container" style="height: 450px;">
-                    <div id="gifts-carousel-container" style="width:100%; height:100%;"></div>
-                    <button class="carousel-btn prev" onclick="prevSlide()">❮</button>
-                    <button class="carousel-btn next" onclick="nextSlide()">❯</button>
-                </div>
-                <div class="carousel-dots" id="gifts-carousel-dots"></div>
-                <div class="text-center p-6 bg-white mt-2 rounded">
-                    <p class="text-lg font-bold" id="gifts-carousel-name"></p>
-                    <p class="text-sm text-gray-600" id="gifts-carousel-desc"></p>
-                    <span id="gifts-carousel-counter" class="text-xs text-gray-400 block mt-2"></span>
-                </div>
+<section id="brindes" class="py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 mb-12">
+        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
+        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
+            <div class="carousel-container" style="height: 400px;">
+                <div id="carousel-executivos-container"></div>
+                <button class="carousel-btn prev" onclick="changeSlide('executivos', -1)">❮</button>
+                <button class="carousel-btn next" onclick="changeSlide('executivos', 1)">❯</button>
             </div>
+            <div id="carousel-executivos-dots" class="carousel-dots"></div>
         </div>
+    </div>
+    </section>
+    <section id="brindes" class="py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 mb-12">
+        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
+        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
+            <div class="carousel-container" style="height: 400px;">
+                <div id="carousel-sustentaveis-container"></div>
+                <button class="carousel-btn prev" onclick="changeSlide('sustentaveis', -1)">❮</button>
+                <button class="carousel-btn next" onclick="changeSlide('sustentaveis', 1)">❯</button>
+            </div>
+            <div id="carousel-sustentaveis-dots" class="carousel-dots"></div>
+        </div>
+    </div>
+    </section>
+    <section id="brindes" class="py-20 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 mb-12">
+        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
+        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
+            <div class="carousel-container" style="height: 400px;">
+                <div id="carousel-tecnologicos-container"></div>
+                <button class="carousel-btn prev" onclick="changeSlide('tecnologicos', -1)">❮</button>
+                <button class="carousel-btn next" onclick="changeSlide('tecnologicos', 1)">❯</button>
+            </div>
+            <div id="carousel-tecnologicos-dots" class="carousel-dots"></div>
+        </div>
+    </div>
     </section>
 
     <section id="contato" class="py-20 text-center">
@@ -163,6 +185,14 @@
                 </div>
                 <input type="text" id="gift-name-input" class="form-input mb-2" placeholder="Nome do brinde">
                 <input type="text" id="gift-desc-input" class="form-input mb-2" placeholder="Descrição curta">
+                <div class="form-group">
+    <label class="form-label">Categoria</label>
+    <select id="gift-category-input" class="form-input">
+        <option value="executivos">Executivos</option>
+        <option value="sustentaveis">Sustentáveis</option>
+        <option value="tecnologicos">Tecnológicos</option>
+    </select>
+</div>
                 <button class="btn btn-primary w-full" onclick="addGift()">Adicionar ao Carrossel</button>
                 <div id="gifts-list" class="mt-4 space-y-2"></div>
             </div>
@@ -201,7 +231,11 @@
         // Cole aqui o link que você pegou no site kvdb.io:
        
         let currentGiftsSlide = 0;
-        let giftProducts = [];
+        let giftProducts = { executivos: [],
+                             sustentaveis: [],
+                             tecnologicos: []
+        };
+        
         let siteData = {};
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -251,9 +285,12 @@
         const data = await response.json();
             
         // Se o Supabase encontrar a linha, os dados estarão no array
-        if (data && data.length > 0) {
-            siteData = data[0].site_data;
-            giftProducts = data[0].gift_products || [];
+        // Dentro do seu loadDataFromCloud, após receber os dados:
+if (data && data.length > 0) {
+    siteData = data[0].site_data;
+    // Se o banco retornar array antigo, converta para o novo formato de objeto
+    giftProducts = data[0].gift_products || { executivos: [], sustentaveis: [], tecnologicos: [] };
+
             console.log("Dados carregados do Supabase com sucesso!");
         } else {
             console.log("Nenhum dado encontrado, carregando valores padrão.");
@@ -332,24 +369,37 @@ async function pushDataToCloud() {
             updateFrontend(); pushDataToCloud(); 
         }
 
-        function addGift() {
-            const name = document.getElementById('gift-name-input').value.trim();
-            const desc = document.getElementById('gift-desc-input').value.trim();
-            let url = document.getElementById('gift-url-input').value.trim();
-            
-            if(!name || !url) { showToast("Nome e URL da imagem são obrigatórios", "error"); return; }
-            
-            // Corrige se a pessoa copiar um link do imgur de forma errada
-            if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
-                url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
-            }
+ function addGift() {
+    const name = document.getElementById('gift-name-input').value.trim();
+    const desc = document.getElementById('gift-desc-input').value.trim();
+    const category = document.getElementById('gift-category-input').value; // Pega a categoria selecionada
+    let url = document.getElementById('gift-url-input').value.trim();
+    
+    if(!name || !url) { showToast("Nome e URL da imagem são obrigatórios", "error"); return; }
+    
+    // Corrige link do imgur
+    if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
+        url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
+    }
 
-            giftProducts.push({ id: Date.now(), name, desc, image: url });
-            document.getElementById('gift-name-input').value = '';
-            document.getElementById('gift-desc-input').value = '';
-            document.getElementById('gift-url-input').value = '';
-            renderGiftsCarousel(); renderGiftsList(); pushDataToCloud();
-        }
+    // Garante que o objeto de categoria existe
+    if (!giftProducts[category]) {
+        giftProducts[category] = [];
+    }
+
+    // Adiciona o brinde na categoria específica
+    giftProducts[category].push({ id: Date.now(), name, desc, image: url });
+    
+    // Limpa campos
+    document.getElementById('gift-name-input').value = '';
+    document.getElementById('gift-desc-input').value = '';
+    document.getElementById('gift-url-input').value = '';
+    
+    // Atualiza tudo
+    renderAllCarousels(); // Você terá uma função que chama o render de cada categoria
+    renderGiftsList(); 
+    pushDataToCloud(); // Salva o objeto completo com as categorias novas
+}
 
         function removeGift(id) { giftProducts = giftProducts.filter(g => g.id !== id); renderGiftsCarousel(); renderGiftsList(); pushDataToCloud(); }
 
@@ -359,30 +409,38 @@ async function pushDataToCloud() {
                 container.innerHTML += `<div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm"><span>${g.name}</span><button class="text-red-500 font-bold" onclick="removeGift(${g.id})">✕</button></div>`;
             });
         }
+// Variável global para controlar os slides de cada categoria
+let activeSlides = { executivos: 0, sustentaveis: 0, tecnologicos: 0 };
 
-        function renderGiftsCarousel() {
-            const container = document.getElementById('gifts-carousel-container'); container.innerHTML = '';
-            if(!giftProducts.length) { container.innerHTML = '<div class="img-placeholder">Nenhum brinde no portfólio.</div>'; return; }
-            
-            giftProducts.forEach((g, idx) => {
-                container.innerHTML += `
-                    <div class="carousel-item ${idx === currentGiftsSlide ? 'active' : ''}">
-                        <img src="${g.image}" onerror="this.onerror=null; this.src='https://placehold.co/600x450/e5e7eb/a3a3a3?text=Erro+de+Link';">
-                    </div>`;
-            });
-            
-            const dots = document.getElementById('gifts-carousel-dots'); dots.innerHTML = '';
-            giftProducts.forEach((_, idx) => {
-                dots.innerHTML += `<button class="dot ${idx === currentGiftsSlide ? 'active' : ''}" onclick="goToSlide(${idx})"></button>`;
-            });
-            
-            const active = giftProducts[currentGiftsSlide];
-            if(active) {
-                document.getElementById('gifts-carousel-name').textContent = active.name;
-                document.getElementById('gifts-carousel-desc').textContent = active.desc || '';
-            }
-            document.getElementById('gifts-carousel-counter').textContent = `Produto ${currentGiftsSlide + 1} de ${giftProducts.length}`;
-        }
+function renderCarousel(category) {
+    const list = giftProducts[category] || [];
+    const container = document.getElementById(`carousel-${category}-container`);
+    const dotsContainer = document.getElementById(`carousel-${category}-dots`);
+    
+    container.innerHTML = '';
+    dotsContainer.innerHTML = '';
+
+    if(!list.length) { container.innerHTML = '<div class="img-placeholder">Sem brindes nesta categoria.</div>'; return; }
+
+    list.forEach((g, idx) => {
+        container.innerHTML += `
+            <div class="carousel-item ${idx === activeSlides[category] ? 'active' : ''}">
+                <img src="${g.image}">
+            </div>`;
+        dotsContainer.innerHTML += `<button class="dot ${idx === activeSlides[category] ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>`;
+    });
+}
+
+function changeSlide(category, direction) {
+    const list = giftProducts[category] || [];
+    activeSlides[category] = (activeSlides[category] + direction + list.length) % list.length;
+    renderCarousel(category);
+}
+
+function goToSlide(category, index) {
+    activeSlides[category] = index;
+    renderCarousel(category);
+}
 
         function nextSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide + 1) % giftProducts.length; renderGiftsCarousel(); } }
         function prevSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide - 1 + giftProducts.length) % giftProducts.length; renderGiftsCarousel(); } }
