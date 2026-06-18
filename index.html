@@ -263,23 +263,19 @@ const CATEGORY_NAMES = {
         
 function updateCategorySelect() {
     const select = document.getElementById('gift-category-input');
-    const titles = siteData.categoryTitles || { 
+    
+    // Se o siteData ou categoryTitles não existirem, usamos os padrões
+    const titles = (siteData && siteData.categoryTitles) ? siteData.categoryTitles : { 
         executivos: "Brindes Executivos", 
         sustentaveis: "Brindes Ecológicos", 
         tecnologicos: "Brindes Tecnológicos" 
     };
-
-    // Salva a seleção atual antes de limpar
-    const currentVal = select.value;
 
     select.innerHTML = `
         <option value="executivos">${titles.executivos}</option>
         <option value="sustentaveis">${titles.sustentaveis}</option>
         <option value="tecnologicos">${titles.tecnologicos}</option>
     `;
-
-    // Restaura a seleção (se houver)
-    if(currentVal) select.value = currentVal;
 }
 
         // Função para salvar os novos títulos no Supabase
@@ -366,7 +362,9 @@ if (data && data.length > 0) {
     } else {
         giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
     }
-    
+    // ADICIONE ESTA LINHA AQUI:
+        updateCategorySelect(); 
+        updateTitles();
 
             console.log("Dados carregados do Supabase com sucesso!");
         } else {
@@ -430,6 +428,7 @@ async function pushDataToCloud() {
                 document.getElementById('about-delivery-input').value = siteData.aboutDelivery || '';
                 document.getElementById('whatsapp-input').value = siteData.whatsapp || '';
                 renderGiftsList();
+                updateCategorySelect();
             } else {
                 showToast('Senha Incorreta', 'error');
             }
