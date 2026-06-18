@@ -337,7 +337,9 @@ async function pushDataToCloud() {
             document.getElementById('about-quality').textContent = siteData.aboutQuality || 'Qualidade garantida em cada peça.';
             document.getElementById('about-delivery').textContent = siteData.aboutDelivery || 'Entregas rápidas e seguras.';
             document.getElementById('whatsapp-link-btn').href = `https://wa.me/${siteData.whatsapp || '5511999999999'}`;
-            renderGiftsCarousel();
+            renderCarousel('executivos');
+    renderCarousel('sustentaveis');
+    renderCarousel('tecnologicos');
         }
 
         function loginAdmin() {
@@ -369,36 +371,26 @@ async function pushDataToCloud() {
             updateFrontend(); pushDataToCloud(); 
         }
 
- function addGift() {
+function addGift() {
     const name = document.getElementById('gift-name-input').value.trim();
     const desc = document.getElementById('gift-desc-input').value.trim();
-    const category = document.getElementById('gift-category-input').value; // Pega a categoria selecionada
+    const category = document.getElementById('gift-category-input').value; // Certifique-se que o ID no HTML é este
     let url = document.getElementById('gift-url-input').value.trim();
     
-    if(!name || !url) { showToast("Nome e URL da imagem são obrigatórios", "error"); return; }
+    if(!name || !url) { showToast("Nome e URL são obrigatórios", "error"); return; }
     
-    // Corrige link do imgur
-    if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
-        url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
-    }
-
-    // Garante que o objeto de categoria existe
+    // 1. Garante que a categoria existe como um array
     if (!giftProducts[category]) {
         giftProducts[category] = [];
     }
 
-    // Adiciona o brinde na categoria específica
+    // 2. Adiciona o brinde na categoria correta
     giftProducts[category].push({ id: Date.now(), name, desc, image: url });
     
-    // Limpa campos
-    document.getElementById('gift-name-input').value = '';
-    document.getElementById('gift-desc-input').value = '';
-    document.getElementById('gift-url-input').value = '';
-    
-    // Atualiza tudo
-    renderAllCarousels(); // Você terá uma função que chama o render de cada categoria
-    renderGiftsList(); 
-    pushDataToCloud(); // Salva o objeto completo com as categorias novas
+    // 3. Atualiza a tela e salva
+    renderGiftsList(); // Atualiza a lista do painel Admin
+    renderAllCarousels(); // Atualiza os 3 carrosséis
+    pushDataToCloud(); // ENVIA O JSON COMPLETO PARA O SUPABASE
 }
 
        function removeGift(category, id) {
