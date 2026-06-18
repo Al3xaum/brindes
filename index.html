@@ -263,19 +263,26 @@ const CATEGORY_NAMES = {
         
 function updateCategorySelect() {
     const select = document.getElementById('gift-category-input');
-    
-    // Se o siteData ou categoryTitles não existirem, usamos os padrões
-    const titles = (siteData && siteData.categoryTitles) ? siteData.categoryTitles : { 
+    const titles = siteData.categoryTitles || { 
         executivos: "Brindes Executivos", 
         sustentaveis: "Brindes Ecológicos", 
         tecnologicos: "Brindes Tecnológicos" 
     };
 
-    select.innerHTML = `
-        <option value="executivos">${titles.executivos}</option>
-        <option value="sustentaveis">${titles.sustentaveis}</option>
-        <option value="tecnologicos">${titles.tecnologicos}</option>
-    `;
+    // Salva a seleção atual
+    const currentVal = select.value;
+
+    // Limpa o select
+    select.innerHTML = '';
+
+    // Cria as opções baseadas nas chaves que existem no seu objeto giftProducts
+    Object.keys(giftProducts).forEach(key => {
+        const displayName = titles[key] || key; // Usa o nome amigável ou o nome técnico
+        select.innerHTML += `<option value="${key}">${displayName}</option>`;
+    });
+
+    // Restaura a seleção
+    if(currentVal) select.value = currentVal;
 }
 
         // Função para salvar os novos títulos no Supabase
