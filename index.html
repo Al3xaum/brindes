@@ -543,7 +543,12 @@ function renderCarousel(category) {
     list.forEach((g, idx) => {
         container.innerHTML += `
             <div class="carousel-item ${idx === activeSlides[category] ? 'active' : ''}">
-                <img src="${g.image}">
+                <div class="flex flex-col items-center p-4">
+<img src="${g.image}" style="max-height: 350px; object-fit: contain;">                
+                <div class="text-center mt-4">
+                        <h4 class="font-bold text-lg">${g.name}</h4>
+                        <p class="text-sm text-gray-600">${g.desc || ''}</p>
+                    </div>
             </div>`;
         dotsContainer.innerHTML += `<button class="dot ${idx === activeSlides[category] ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>`;
     });
