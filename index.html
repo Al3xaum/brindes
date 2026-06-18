@@ -401,14 +401,30 @@ async function pushDataToCloud() {
     pushDataToCloud(); // Salva o objeto completo com as categorias novas
 }
 
-        function removeGift(id) { giftProducts = giftProducts.filter(g => g.id !== id); renderGiftsCarousel(); renderGiftsList(); pushDataToCloud(); }
+       function removeGift(category, id) {
+    // Filtra o item dentro da lista específica daquela categoria
+    giftProducts[category] = giftProducts[category].filter(g => g.id !== id);
+    
+    // Atualiza a tela e salva na nuvem
+    renderCarousel(category); 
+    renderGiftsList(); 
+    pushDataToCloud();
+}
+      function renderGiftsList() {
+    const container = document.getElementById('gifts-list');
+    container.innerHTML = '';
 
-        function renderGiftsList() {
-            const container = document.getElementById('gifts-list'); container.innerHTML = '';
-            giftProducts.forEach(g => {
-                container.innerHTML += `<div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm"><span>${g.name}</span><button class="text-red-500 font-bold" onclick="removeGift(${g.id})">✕</button></div>`;
-            });
-        }
+    // Percorre cada categoria (executivos, sustentaveis, tecnologicos)
+    Object.keys(giftProducts).forEach(category => {
+        giftProducts[category].forEach(g => {
+            container.innerHTML += `
+                <div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm mb-1">
+                    <span>${g.name} (${category})</span>
+                    <button class="text-red-500 font-bold" onclick="removeGift('${category}', ${g.id})">✕</button>
+                </div>`;
+        });
+    });
+}
 // Variável global para controlar os slides de cada categoria
 let activeSlides = { executivos: 0, sustentaveis: 0, tecnologicos: 0 };
 
