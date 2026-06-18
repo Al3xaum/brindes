@@ -501,9 +501,11 @@ function renderGiftsList() {
     container.innerHTML = '';
 
     // Verifica se giftProducts é um objeto e não um array vazio
-    if (!giftProducts || typeof giftProducts !== 'object' || Array.isArray(giftProducts)) {
-        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
-    }
+   const titles = siteData.categoryTitles || { 
+        executivos: "Executivos", 
+        sustentaveis: "Sustentáveis", 
+        tecnologicos: "Tecnológicos" 
+    };
 
     Object.keys(giftProducts).forEach(category => {
         // Verifica se a categoria é um array antes de iterar
