@@ -14,7 +14,13 @@
         .carousel-container { position: relative; overflow: hidden; border-radius: 12px; background: #f3f4f6; }
         .carousel-item { display: none; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-in-out; }
         .carousel-item.active { display: flex; align-items: center; justify-content: center; opacity: 1; }
-        .carousel-item img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto; }
+        .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Isso corta a imagem para preencher sem distorcer */
+    /* Se preferir que ela apareça inteira sem cortar, use: object-fit: contain; */
+    border-radius: 8px;
+}
         .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; cursor: pointer; transition: all 0.3s ease; }
         .dot.active { background: #667eea; width: 24px; border-radius: 5px; }
@@ -386,25 +392,37 @@ async function pushDataToCloud() {
 }
 
 function addGift() {
-    const name = document.getElementById('gift-name-input').value.trim();
-    const desc = document.getElementById('gift-desc-input').value.trim();
-    const category = document.getElementById('gift-category-input').value; // Certifique-se que o ID no HTML é este
-    let url = document.getElementById('gift-url-input').value.trim();
+    // 1. Pegar os elementos
+    const nameInput = document.getElementById('gift-name-input');
+    const descInput = document.getElementById('gift-desc-input');
+    const urlInput = document.getElementById('gift-url-input');
+    const category = document.getElementById('gift-category-input').value;
+
+    const name = nameInput.value.trim();
+    const desc = descInput.value.trim();
+    let url = urlInput.value.trim();
     
     if(!name || !url) { showToast("Nome e URL são obrigatórios", "error"); return; }
     
-    // 1. Garante que a categoria existe como um array
-    if (!giftProducts[category]) {
-        giftProducts[category] = [];
+    // 2. Lógica do Imgur
+    if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
+        url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
     }
 
-    // 2. Adiciona o brinde na categoria correta
+    // 3. Adicionar
+    if (!giftProducts[category]) giftProducts[category] = [];
     giftProducts[category].push({ id: Date.now(), name, desc, image: url });
+
+    // 4. LIMPEZA FORÇADA (Agora vai funcionar)
+    nameInput.value = '';
+    descInput.value = '';
+    urlInput.value = '';
     
-    // 3. Atualiza a tela e salva
-    renderGiftsList(); // Atualiza a lista do painel Admin
-    renderAllCarousels(); // Atualiza os 3 carrosséis
-    pushDataToCloud(); // ENVIA O JSON COMPLETO PARA O SUPABASE
+    // 5. Atualizar
+    renderGiftsList(); 
+    renderAllCarousels(); 
+    pushDataToCloud();
+    showToast("Brinde adicionado com sucesso!");
 }
 
        function removeGift(category, id) {
