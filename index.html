@@ -287,10 +287,20 @@
         // Se o Supabase encontrar a linha, os dados estarão no array
         // Dentro do seu loadDataFromCloud, após receber os dados:
 if (data && data.length > 0) {
+    
     siteData = data[0].site_data;
-    // Se o banco retornar array antigo, converta para o novo formato de objeto
-    giftProducts = data[0].gift_products || { executivos: [], sustentaveis: [], tecnologicos: [] };
-
+    
+    let dbGifts = data[0].gift_products;
+    
+    // SE FOR UM ARRAY (antigo), converte para o OBJETO (novo)
+    if (Array.isArray(dbGifts)) {
+        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
+    } else {
+        giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
+    }
+} else {
+    giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
+}
             console.log("Dados carregados do Supabase com sucesso!");
         } else {
             console.log("Nenhum dado encontrado, carregando valores padrão.");
@@ -370,6 +380,11 @@ async function pushDataToCloud() {
             siteData.whatsapp = document.getElementById('whatsapp-input').value; 
             updateFrontend(); pushDataToCloud(); 
         }
+        function renderAllCarousels() {
+    renderCarousel('executivos');
+    renderCarousel('sustentaveis');
+    renderCarousel('tecnologicos');
+}
 
 function addGift() {
     const name = document.getElementById('gift-name-input').value.trim();
@@ -402,19 +417,26 @@ function addGift() {
     renderGiftsList(); 
     pushDataToCloud();
 }
-      function renderGiftsList() {
+function renderGiftsList() {
     const container = document.getElementById('gifts-list');
     container.innerHTML = '';
 
-    // Percorre cada categoria (executivos, sustentaveis, tecnologicos)
+    // Verifica se giftProducts é um objeto e não um array vazio
+    if (!giftProducts || typeof giftProducts !== 'object' || Array.isArray(giftProducts)) {
+        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
+    }
+
     Object.keys(giftProducts).forEach(category => {
-        giftProducts[category].forEach(g => {
-            container.innerHTML += `
-                <div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm mb-1">
-                    <span>${g.name} (${category})</span>
-                    <button class="text-red-500 font-bold" onclick="removeGift('${category}', ${g.id})">✕</button>
-                </div>`;
-        });
+        // Verifica se a categoria é um array antes de iterar
+        if (Array.isArray(giftProducts[category])) {
+            giftProducts[category].forEach(g => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm mb-1">
+                        <span>${g.name} (${category})</span>
+                        <button class="text-red-500 font-bold" onclick="removeGift('${category}', ${g.id})">✕</button>
+                    </div>`;
+            });
+        }
     });
 }
 // Variável global para controlar os slides de cada categoria
