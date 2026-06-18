@@ -102,7 +102,7 @@
 
 <section id="brindes" class="py-20 bg-gray-50">
     <div class="max-w-3xl mx-auto px-4 mb-12">
-        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
+<h3 id="display-executivos" class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
         <div class="bg-gray-100 rounded-lg shadow-lg p-2">
             <div class="carousel-container" style="height: 400px;">
                 <div id="carousel-executivos-container" style="width:100%; height:100%;"></div>
@@ -115,7 +115,7 @@
     </section>
     <section id="brindes" class="py-20 bg-gray-50">
     <div class="max-w-3xl mx-auto px-4 mb-12">
-        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Sustentaveis</h3>
+<h3 id="display-sustentaveis" class="text-2xl font-bold mb-4 text-center">Brindes Sustentáveis</h3>
         <div class="bg-gray-100 rounded-lg shadow-lg p-2">
             <div class="carousel-container" style="height: 400px;">
                 <div id="carousel-sustentaveis-container" style="width:100%; height:100%;"></div>
@@ -128,7 +128,7 @@
     </section>
     <section id="brindes" class="py-20 bg-gray-50">
     <div class="max-w-3xl mx-auto px-4 mb-12">
-        <h3 class="text-2xl font-bold mb-4 text-center">Brindes Tecnológicos</h3>
+<h3 id="display-tecnologicos" class="text-2xl font-bold mb-4 text-center">Brindes Tecnológicos</h3>
         <div class="bg-gray-100 rounded-lg shadow-lg p-2">
             <div class="carousel-container" style="height: 400px;">
                 <div id="carousel-tecnologicos-container" style="width:100%; height:100%;"></div>
@@ -194,17 +194,21 @@
                 </div>
                 <input type="text" id="gift-name-input" class="form-input mb-2" placeholder="Nome do brinde">
                 <input type="text" id="gift-desc-input" class="form-input mb-2" placeholder="Descrição curta">
-                <div class="form-group">
+    <div class="form-group">
     <label class="form-label">Categoria</label>
     <select id="gift-category-input" class="form-input">
-        <option value="executivos">Executivos</option>
-        <option value="sustentaveis">Sustentáveis</option>
-        <option value="tecnologicos">Tecnológicos</option>
-    </select>
+        </select>
 </div>
                 <button class="btn btn-primary w-full" onclick="addGift()">Adicionar ao Carrossel</button>
                 <div id="gifts-list" class="mt-4 space-y-2"></div>
             </div>
+            <div class="mb-6 border-b pb-6">
+    <h4 class="font-bold mb-2">Alterar Títulos das Categorias</h4>
+    <input type="text" id="title-executivos-input" class="form-input mb-2" placeholder="Nome para Executivos">
+    <input type="text" id="title-sustentaveis-input" class="form-input mb-2" placeholder="Nome para Sustentáveis">
+    <input type="text" id="title-tecnologicos-input" class="form-input mb-2" placeholder="Nome para Tecnológicos">
+    <button class="btn btn-primary w-full" onclick="saveCategoryTitles()">Salvar Títulos</button>
+</div>
 
             <div>
                 <h4 class="font-bold mb-2">Contacto</h4>
@@ -238,6 +242,12 @@
         // CONFIGURAÇÃO DO COFRE DE DADOS (GRATUITO E NATIVO)
         // ==========================================
         // Cole aqui o link que você pegou no site kvdb.io:
+        // Configuração dos nomes que aparecem para o cliente e no Admin
+const CATEGORY_NAMES = {
+    executivos: "Brindes Executivos",
+    sustentaveis: "Brindes Ecológicos", // Mude aqui para o nome que quiser
+    tecnologicos: "Brindes Tecnológicos"
+};
        
         let currentGiftsSlide = 0;
         let giftProducts = { executivos: [],
@@ -250,6 +260,55 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromCloud();
         });
+        
+function updateCategorySelect() {
+    const select = document.getElementById('gift-category-input');
+    const titles = siteData.categoryTitles || { 
+        executivos: "Brindes Executivos", 
+        sustentaveis: "Brindes Ecológicos", 
+        tecnologicos: "Brindes Tecnológicos" 
+    };
+
+    // Salva a seleção atual antes de limpar
+    const currentVal = select.value;
+
+    select.innerHTML = `
+        <option value="executivos">${titles.executivos}</option>
+        <option value="sustentaveis">${titles.sustentaveis}</option>
+        <option value="tecnologicos">${titles.tecnologicos}</option>
+    `;
+
+    // Restaura a seleção (se houver)
+    if(currentVal) select.value = currentVal;
+}
+
+        // Função para salvar os novos títulos no Supabase
+function saveCategoryTitles() {
+    siteData.categoryTitles = {
+        executivos: document.getElementById('title-executivos-input').value,
+        sustentaveis: document.getElementById('title-sustentaveis-input').value,
+        tecnologicos: document.getElementById('title-tecnologicos-input').value
+    };
+    updateTitles();
+    pushDataToCloud();
+    updateCategorySelect();
+    
+ 
+    showToast("Títulos salvos com sucesso!");
+}
+
+// Função que aplica os títulos na tela
+function updateTitles() {
+    const titles = siteData.categoryTitles || { 
+        executivos: "Brindes Executivos", 
+        sustentaveis: "Brindes Sustentáveis", 
+        tecnologicos: "Brindes Tecnológicos" 
+    };
+    
+    document.getElementById('display-executivos').textContent = titles.executivos;
+    document.getElementById('display-sustentaveis').textContent = titles.sustentaveis;
+    document.getElementById('display-tecnologicos').textContent = titles.tecnologicos;
+}
 
         function loadFallbacks() {
             siteData = {
@@ -358,6 +417,7 @@ async function pushDataToCloud() {
             renderCarousel('executivos');
     renderCarousel('sustentaveis');
     renderCarousel('tecnologicos');
+    updateTitles(); // Adicione isso aqui
         }
 
         function loginAdmin() {
