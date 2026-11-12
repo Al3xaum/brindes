@@ -4,233 +4,538 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nilson Gomes - Brindes Personalizados 3D</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS SDK para upload e gerenciamento de arquivos persistentes -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background: #ffffff; color: #1f2937; }
         .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .carousel-container { position: relative; overflow: hidden; border-radius: 12px; background: #f3f4f6; }
-        .carousel-item { display: none; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease-in-out; }
-        .carousel-item.active { display: flex; align-items: center; justify-content: center; opacity: 1; }
-       .carousel-item img {
-    width: 100%;
-    height: 100%;
-    /* 'contain' garante que a imagem inteira apareça, mantendo a proporção original */
-    object-fit: contain; 
-    display: block;
-    margin: 0 auto;
-    background-color: #f3f4f6; /* Preenche o espaço vazio ao redor com a cor do container */
-}
-}
-        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; cursor: pointer; transition: all 0.3s ease; }
-        .dot.active { background: #667eea; width: 24px; border-radius: 5px; }
-        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.4); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; }
-        .carousel-btn:hover { background: rgba(0, 0, 0, 0.7); }
-        .carousel-btn.prev { left: 16px; }
-        .carousel-btn.next { right: 16px; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        
+        /* Carrossel */
+        .carousel-container { 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 14px; 
+            background: #ffffff; 
+            border: 1px solid #e5e7eb;
+            height: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-item { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; 
+            transition: opacity 0.4s ease-in-out; 
+        }
+        .carousel-item.active { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            opacity: 1; 
+        }
+        .carousel-dots { 
+            display: flex; 
+            justify-content: center; 
+            gap: 8px; 
+            margin-top: 16px; 
+            flex-wrap: wrap; 
+        }
+        .dot { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            background: #d1d5db; 
+            border: none;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+        .dot.active { 
+            background: #667eea; 
+            width: 26px; 
+            border-radius: 5px; 
+        }
+        .carousel-btn { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: rgba(17, 24, 39, 0.6); 
+            color: white; 
+            border: none; 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s ease; 
+            z-index: 10; 
+            font-size: 18px;
+        }
+        .carousel-btn:hover { background: rgba(17, 24, 39, 0.85); transform: translateY(-50%) scale(1.05); }
+        .carousel-btn.prev { left: 14px; }
+        .carousel-btn.next { right: 14px; }
+        
+        /* Modal & Admin */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0, 0, 0, 0.55); 
+            backdrop-filter: blur(2px);
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
         .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px; }
-        .form-input, .form-textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
-        .form-textarea { resize: vertical; min-height: 100px; font-family: inherit; }
-        .btn { padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; }
+        .modal { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 32px; 
+            max-width: 500px; 
+            width: 90%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .form-input, .form-textarea, .form-select { 
+            width: 100%; 
+            padding: 10px 14px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        .form-textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+        
+        .btn { 
+            padding: 10px 22px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            font-size: 14px; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
         .btn-primary { background: #667eea; color: white; }
         .btn-primary:hover { background: #5568d3; }
+        .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
         .btn-secondary { background: #e5e7eb; color: #1f2937; }
+        .btn-secondary:hover { background: #d1d5db; }
         .btn-danger { background: #ef4444; color: white; }
-        .admin-badge { position: fixed; bottom: 16px; right: 16px; z-index: 100; }
-        .admin-btn { width: 50px; height: 50px; border-radius: 50%; background: #1f2937; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
-        .admin-panel { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1); z-index: 2000; overflow-y: auto; padding: 24px; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .admin-badge { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
+        .admin-btn { 
+            width: 52px; 
+            height: 52px; 
+            border-radius: 50%; 
+            background: #1f2937; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 22px; 
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); 
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .admin-btn:hover { transform: scale(1.08); }
+        
+        .admin-panel { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            right: 0; 
+            width: 440px; 
+            max-width: 100%;
+            height: 100vh; 
+            background: white; 
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.18); 
+            z-index: 2000; 
+            overflow-y: auto; 
+            padding: 24px; 
+        }
         .admin-panel.open { display: block; }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 16px 24px; border-radius: 8px; z-index: 2001; opacity: 0; animation: slideUp 0.3s ease forwards; }
-        @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        @media (max-width: 640px) { .admin-panel { width: 100%; } }
-        .img-placeholder { width: 100%; height: 100%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
-        .info-box { background: #f3f4f6; border-left: 4px solid #667eea; padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; }
-        .tip-box { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 6px; font-size: 12px; margin-top: 4px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #e5e7eb; }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 24px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #10b981; 
+            color: white; 
+            padding: 14px 24px; 
+            border-radius: 10px; 
+            z-index: 2100; 
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0; 
+            animation: slideUp 0.3s ease forwards; 
+        }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); } 
+            to { opacity: 1; transform: translateX(-50%) translateY(0); } 
+        }
+        
+        .img-placeholder { width: 100%; height: 100%; background: #f9fafb; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+        .info-box { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; color: #166534; }
+        .tip-box { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 6px; font-size: 12px; margin-top: 6px; }
+        
+        /* Dropzone Upload */
+        .upload-dropzone {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+        }
+        .upload-dropzone:hover, .upload-dropzone.dragover {
+            border-color: #667eea;
+            background: #eff6ff;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Cabeçalho -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900">Nilson Gomes</h1>
-            <nav class="hidden sm:flex gap-8">
-                <a href="#sobre" class="text-gray-700 hover:text-indigo-600">Sobre</a>
-                <a href="#brindes" class="text-gray-700 hover:text-indigo-600">Brindes</a>
-                <a href="#contato" class="text-gray-700 hover:text-indigo-600">Contato</a>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Nilson Gomes</h1>
+            <nav class="hidden sm:flex gap-8 font-medium">
+                <a href="#sobre" class="text-gray-700 hover:text-indigo-600 transition">Sobre</a>
+                <a href="#brindes" class="text-gray-700 hover:text-indigo-600 transition">Brindes</a>
+                <a href="#contato" class="text-gray-700 hover:text-indigo-600 transition">Contato</a>
             </nav>
         </div>
     </header>
 
+    <!-- Seção Hero -->
     <section class="hero-gradient py-20 text-center">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-5xl font-bold mb-6">Brindes Personalizados 3D</h2>
-            <p id="hero-description" class="text-xl mb-8 opacity-90">A carregar conteúdo...</p>
-            <div class="flex gap-4 justify-center">
-                <a href="#brindes" class="btn btn-primary">Ver Portfólio</a>
-                <a href="#contato" class="btn btn-secondary">Solicitar Orçamento</a>
+            <h2 class="text-4xl sm:text-5xl font-extrabold mb-6">Brindes Personalizados 3D</h2>
+            <p id="hero-description" class="text-lg sm:text-xl mb-8 opacity-95 max-w-2xl mx-auto">A carregar conteúdo...</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="#brindes" class="btn btn-primary bg-white text-indigo-700 hover:bg-gray-100 shadow-md">Ver Portfólio</a>
+                <a href="#contato" class="btn btn-secondary bg-indigo-900 bg-opacity-40 text-white hover:bg-opacity-60 border border-white border-opacity-30">Solicitar Orçamento</a>
             </div>
         </div>
     </section>
 
+    <!-- Seção Sobre -->
     <section id="sobre" class="py-20 max-w-6xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="p-8 bg-gray-50 rounded-lg">
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
                 <div class="text-4xl mb-4">🎨</div>
-                <h4 class="text-xl font-bold mb-3">Design Personalizado</h4>
-                <p id="about-design" class="text-gray-700">A carregar...</p>
+                <h4 class="text-xl font-bold mb-3 text-gray-900">Design Personalizado</h4>
+                <p id="about-design" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
-            <div class="p-8 bg-gray-50 rounded-lg">
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
                 <div class="text-4xl mb-4">⭐</div>
-                <h4 class="text-xl font-bold mb-3">Qualidade Premium</h4>
-                <p id="about-quality" class="text-gray-700">A carregar...</p>
+                <h4 class="text-xl font-bold mb-3 text-gray-900">Qualidade Premium</h4>
+                <p id="about-quality" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
-            <div class="p-8 bg-gray-50 rounded-lg">
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
                 <div class="text-4xl mb-4">🚀</div>
-                <h4 class="text-xl font-bold mb-3">Entrega Rápida</h4>
-                <p id="about-delivery" class="text-gray-700">A carregar...</p>
+                <h4 class="text-xl font-bold mb-3 text-gray-900">Entrega Rápida</h4>
+                <p id="about-delivery" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
         </div>
     </section>
 
-<section id="brindes" class="py-20 bg-gray-50">
-    <div class="max-w-3xl mx-auto px-4 mb-12">
-<h3 id="display-executivos" class="text-2xl font-bold mb-4 text-center">Brindes Executivos</h3>
-        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
-            <div class="carousel-container" style="height: 400px;">
-                <div id="carousel-executivos-container" style="width:100%; height:100%;"></div>
-                <button class="carousel-btn prev" onclick="changeSlide('executivos', -1)">❮</button>
-                <button class="carousel-btn next" onclick="changeSlide('executivos', 1)">❯</button>
+    <!-- Seção Portfólio de Brindes (Carrosséis) -->
+    <section id="brindes" class="py-20 bg-gray-50 border-t border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Portfólio de Brindes</h3>
+                <p class="text-gray-600 max-w-xl mx-auto">Explore nossos brindes exclusivos fabricados em impressão 3D de alta precisão.</p>
             </div>
-            <div id="carousel-executivos-dots" class="carousel-dots"></div>
-        </div>
-    </div>
-    </section>
-    <section id="brindes" class="py-20 bg-gray-50">
-    <div class="max-w-3xl mx-auto px-4 mb-12">
-<h3 id="display-sustentaveis" class="text-2xl font-bold mb-4 text-center">Brindes Sustentáveis</h3>
-        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
-            <div class="carousel-container" style="height: 400px;">
-                <div id="carousel-sustentaveis-container" style="width:100%; height:100%;"></div>
-                <button class="carousel-btn prev" onclick="changeSlide('sustentaveis', -1)">❮</button>
-                <button class="carousel-btn next" onclick="changeSlide('sustentaveis', 1)">❯</button>
+
+            <!-- Carrossel 1: Executivos -->
+            <div class="mb-16">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="display-executivos" class="text-2xl font-bold text-gray-800">Brindes Executivos</h3>
+                    <span class="text-xs font-semibold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">Linha Executiva</span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
+                    <div class="carousel-container">
+                        <div id="carousel-executivos-container" style="width:100%; height:100%;"></div>
+                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('executivos', -1)">❮</button>
+                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('executivos', 1)">❯</button>
+                    </div>
+                    <div id="carousel-executivos-dots" class="carousel-dots"></div>
+                </div>
             </div>
-            <div id="carousel-sustentaveis-dots" class="carousel-dots"></div>
-        </div>
-    </div>
-    </section>
-    <section id="brindes" class="py-20 bg-gray-50">
-    <div class="max-w-3xl mx-auto px-4 mb-12">
-<h3 id="display-tecnologicos" class="text-2xl font-bold mb-4 text-center">Brindes Tecnológicos</h3>
-        <div class="bg-gray-100 rounded-lg shadow-lg p-2">
-            <div class="carousel-container" style="height: 400px;">
-                <div id="carousel-tecnologicos-container" style="width:100%; height:100%;"></div>
-                <button class="carousel-btn prev" onclick="changeSlide('tecnologicos', -1)">❮</button>
-                <button class="carousel-btn next" onclick="changeSlide('tecnologicos', 1)">❯</button>
+
+            <!-- Carrossel 2: Sustentáveis -->
+            <div class="mb-16">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="display-sustentaveis" class="text-2xl font-bold text-gray-800">Brindes Sustentáveis</h3>
+                    <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">Ecológico / PLA</span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
+                    <div class="carousel-container">
+                        <div id="carousel-sustentaveis-container" style="width:100%; height:100%;"></div>
+                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('sustentaveis', -1)">❮</button>
+                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('sustentaveis', 1)">❯</button>
+                    </div>
+                    <div id="carousel-sustentaveis-dots" class="carousel-dots"></div>
+                </div>
             </div>
-            <div id="carousel-tecnologicos-dots" class="carousel-dots"></div>
+
+            <!-- Carrossel 3: Tecnológicos -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="display-tecnologicos" class="text-2xl font-bold text-gray-800">Brindes Tecnológicos</h3>
+                    <span class="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Tecnologia & Inovação</span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
+                    <div class="carousel-container">
+                        <div id="carousel-tecnologicos-container" style="width:100%; height:100%;"></div>
+                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('tecnologicos', -1)">❮</button>
+                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('tecnologicos', 1)">❯</button>
+                    </div>
+                    <div id="carousel-tecnologicos-dots" class="carousel-dots"></div>
+                </div>
+            </div>
         </div>
-    </div>
     </section>
 
+    <!-- Seção Contato -->
     <section id="contato" class="py-20 text-center">
-        <h3 class="text-3xl font-bold mb-8">Vamos Criar Algo Especial?</h3>
-        <div class="flex gap-4 justify-center">
-            <button class="btn btn-primary" onclick="openContactModal()">Solicitar Orçamento</button>
-            <a id="whatsapp-link-btn" href="#" target="_blank" class="btn btn-secondary">WhatsApp</a>
+        <div class="max-w-xl mx-auto px-4">
+            <h3 class="text-3xl font-bold mb-4 text-gray-900">Vamos Criar Algo Especial?</h3>
+            <p class="text-gray-600 mb-8">Fale diretamente conosco para orçar seus brindes personalizados com a sua marca.</p>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="btn btn-primary" onclick="openContactModal()">Solicitar Orçamento</button>
+                <a id="whatsapp-link-btn" href="#" target="_blank" class="btn btn-secondary flex items-center gap-2">
+                    <span>💬 WhatsApp Direto</span>
+                </a>
+            </div>
         </div>
     </section>
 
+    <!-- Botão de Acesso ao Painel Admin -->
     <div class="admin-badge">
-        <button class="admin-btn" onclick="toggleAdminPanel()">⚙️</button>
+        <button class="admin-btn" title="Painel Administrativo" onclick="toggleAdminPanel()">⚙️</button>
     </div>
 
+    <!-- Painel Lateral de Administração -->
     <div class="admin-panel" id="admin-panel">
         <div class="admin-header">
-            <h2 class="text-xl font-bold">Painel de Administração</h2>
-            <button onclick="toggleAdminPanel()">✕</button>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Painel de Administração</h2>
+                <p class="text-xs text-gray-500">Nilson Gomes 3D</p>
+            </div>
+            <button class="text-gray-400 hover:text-gray-700 text-2xl font-bold" onclick="toggleAdminPanel()">✕</button>
         </div>
 
+        <!-- Tela de Login do Admin -->
         <div id="admin-login">
             <div class="form-group">
-                <label class="form-label">Senha Admin</label>
-                <input type="password" id="admin-password" class="form-input" placeholder="admin123">
+                <label class="form-label">Senha do Administrador</label>
+                <input type="password" id="admin-password" class="form-input" placeholder="Digite sua senha">
             </div>
-            <button class="btn btn-primary w-full" onclick="loginAdmin()">Entrar</button>
+            <button class="btn btn-primary w-full" onclick="loginAdmin()">Entrar no Painel</button>
         </div>
 
+        <!-- Conteúdo do Admin (Apenas pós-login) -->
         <div id="admin-area" style="display:none;">
-            <div class="info-box">☁️ Ligado ao cofre seguro e independente de banco de dados. As alterações agora funcionam!</div>
+            <div class="info-box">☁️ Conectado à nuvem. Todas as alterações e imagens são salvas de forma permanente!</div>
             
-            <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold mb-2">Hero Texto</h4>
-                <textarea id="hero-desc-input" class="form-textarea"></textarea>
-                <button class="btn btn-primary w-full mt-2" onclick="saveHeroContent()">Salvar Hero</button>
+            <!-- Box de Ajuda sobre Armazenamento -->
+            <div class="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+                <div class="font-bold flex items-center justify-between cursor-pointer" onclick="toggleStorageHelp()">
+                    <span>☁️ Armazenamento de Fotos (Supabase)</span>
+                    <span id="storage-help-icon">▼</span>
+                </div>
+                <div id="storage-help-content" class="hidden mt-2 pt-2 border-t border-blue-200 text-blue-800 space-y-1">
+                    <p>Ao enviar uma foto, ela é otimizada e salva no Supabase Storage (bucket <code>brindes</code>).</p>
+                    <p><strong>Configuração no Supabase:</strong></p>
+                    <ol class="list-decimal pl-4 space-y-0.5">
+                        <li>Acesse o painel do Supabase.</li>
+                        <li>Clique em <strong>Storage</strong> &gt; <strong>New bucket</strong>.</li>
+                        <li>Nome: <code>brindes</code> (marque <strong>Public bucket</strong>).</li>
+                    </ol>
+                    <p class="text-[11px] text-blue-600 mt-1"><em>* Dica: Se o bucket ainda não estiver criado, a foto é automaticamente salva comprimida no banco de dados para você nunca travar!</em></p>
+                </div>
             </div>
 
+            <!-- Bloco 1: Adicionar Novo Brinde -->
             <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold mb-2">Seções Sobre</h4>
-                <input type="text" id="about-design-input" class="form-input mb-2" placeholder="Design">
-                <input type="text" id="about-quality-input" class="form-input mb-2" placeholder="Qualidade">
-                <input type="text" id="about-delivery-input" class="form-input mb-2" placeholder="Entrega">
-                <button class="btn btn-primary w-full" onclick="saveAboutContent()">Salvar Sobre</button>
-            </div>
+                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <span>➕ Adicionar Brinde</span>
+                </h4>
 
-            <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold mb-2">Adicionar Brinde</h4>
-                <div class="form-group">
-                    <label class="form-label">Cole o link (URL) direto da imagem</label>
-                    <input type="text" id="gift-url-input" class="form-input" placeholder="https://exemplo.com/foto.jpg">
-                    <div class="tip-box">
-                        💡 <strong>Dica:</strong> Copie o "Endereço da imagem" (precisa terminar em .jpg, .png).
+                <!-- Seletor de Modo de Imagem: Upload vs Link -->
+                <div class="flex border-b border-gray-200 mb-4">
+                    <button id="tab-upload-file" type="button" class="flex-1 py-2 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 transition" onclick="setImageSource('file')">
+                        📤 Enviar Foto (Upload)
+                    </button>
+                    <button id="tab-upload-url" type="button" class="flex-1 py-2 text-xs font-semibold text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition" onclick="setImageSource('url')">
+                        🔗 Colar Link (URL)
+                    </button>
+                </div>
+
+                <!-- Opção 1: Upload de Foto Local -->
+                <div id="section-upload-file" class="mb-4">
+                    <div id="dropzone" class="upload-dropzone" onclick="document.getElementById('gift-file-input').click()">
+                        <div id="dropzone-prompt">
+                            <div class="text-3xl mb-1">📷</div>
+                            <p class="text-sm font-semibold text-gray-700">Clique para escolher a foto</p>
+                            <p class="text-xs text-gray-500">ou arraste e solte o arquivo aqui</p>
+                            <span class="inline-block mt-2 px-2.5 py-0.5 bg-gray-200 text-gray-700 rounded text-[11px]">JPG, PNG ou WEBP</span>
+                        </div>
+                        <div id="file-preview-container" class="hidden">
+                            <img id="file-preview-img" class="max-h-44 mx-auto rounded-lg shadow-sm mb-2 object-contain" src="" alt="Pré-visualização">
+                            <p id="file-preview-name" class="text-xs text-gray-600 font-medium truncate mb-2"></p>
+                            <button type="button" class="text-xs text-red-600 hover:text-red-800 font-semibold underline" onclick="clearSelectedFile(event)">
+                                Escolher outra foto
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="gift-file-input" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+                </div>
+
+                <!-- Opção 2: Link de Imagem Direta -->
+                <div id="section-upload-url" class="mb-4 hidden">
+                    <div class="form-group">
+                        <label class="form-label">URL direta da imagem</label>
+                        <input type="text" id="gift-url-input" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+                        <div class="tip-box">
+                            💡 Cole o endereço direto da imagem (Imgur, Cloudinary, etc.).
+                        </div>
                     </div>
                 </div>
-                <input type="text" id="gift-name-input" class="form-input mb-2" placeholder="Nome do brinde">
-                <input type="text" id="gift-desc-input" class="form-input mb-2" placeholder="Descrição curta">
-    <div class="form-group">
-    <label class="form-label">Categoria</label>
-    <select id="gift-category-input" class="form-input">
-        </select>
-</div>
-                <button class="btn btn-primary w-full" onclick="addGift()">Adicionar ao Carrossel</button>
-                <div id="gifts-list" class="mt-4 space-y-2"></div>
-            </div>
-            <div class="mb-6 border-b pb-6">
-    <h4 class="font-bold mb-2">Alterar Títulos das Categorias</h4>
-    <input type="text" id="title-executivos-input" class="form-input mb-2" placeholder="Nome para Executivos">
-    <input type="text" id="title-sustentaveis-input" class="form-input mb-2" placeholder="Nome para Sustentáveis">
-    <input type="text" id="title-tecnologicos-input" class="form-input mb-2" placeholder="Nome para Tecnológicos">
-    <button class="btn btn-primary w-full" onclick="saveCategoryTitles()">Salvar Títulos</button>
-</div>
 
-            <div>
-                <h4 class="font-bold mb-2">Contacto</h4>
+                <!-- Campos de Dados do Brinde -->
                 <div class="form-group">
-                    <label class="form-label">WhatsApp (Apenas números com DDD)</label>
-                    <input type="text" id="whatsapp-input" class="form-input mb-2" placeholder="Ex: 5511999999999">
+                    <label class="form-label">Nome do Brinde *</label>
+                    <input type="text" id="gift-name-input" class="form-input" placeholder="Ex: Chaveiro Articulado Premium">
                 </div>
-                <button class="btn btn-primary w-full" onclick="saveContactData()">Salvar Contacto</button>
+
+                <div class="form-group">
+                    <label class="form-label">Descrição curta *</label>
+                    <textarea id="gift-desc-input" class="form-input" style="min-height: 70px;" placeholder="Ex: Produzido em filamento biodegradável de alta resolução."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Associar ao Carrossel (Categoria) *</label>
+                    <select id="gift-category-input" class="form-select"></select>
+                </div>
+
+                <button id="btn-add-gift" class="btn btn-primary w-full shadow" onclick="addGift()">
+                    Adicionar ao Carrossel
+                </button>
+            </div>
+
+            <!-- Bloco 2: Lista de Brindes Cadastrados (Gerenciamento) -->
+            <div class="mb-6 border-b pb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-bold text-gray-900">Brindes no Site</h4>
+                    <span id="gifts-count-badge" class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-semibold">0 itens</span>
+                </div>
+                <div id="gifts-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Bloco 3: Alterar Títulos das Categorias -->
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold text-gray-900 mb-2">Títulos das Categorias</h4>
+                <div class="space-y-2">
+                    <div>
+                        <label class="text-xs text-gray-500 font-semibold">Categoria 1 (Executivos)</label>
+                        <input type="text" id="title-executivos-input" class="form-input" placeholder="Nome para Executivos">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 font-semibold">Categoria 2 (Sustentáveis)</label>
+                        <input type="text" id="title-sustentaveis-input" class="form-input" placeholder="Nome para Sustentáveis">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 font-semibold">Categoria 3 (Tecnológicos)</label>
+                        <input type="text" id="title-tecnologicos-input" class="form-input" placeholder="Nome para Tecnológicos">
+                    </div>
+                </div>
+                <button class="btn btn-primary w-full mt-3" onclick="saveCategoryTitles()">Salvar Títulos</button>
+            </div>
+
+            <!-- Bloco 4: Hero Texto -->
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold text-gray-900 mb-2">Texto da Seção Principal (Hero)</h4>
+                <textarea id="hero-desc-input" class="form-textarea"></textarea>
+                <button class="btn btn-primary w-full mt-2" onclick="saveHeroContent()">Salvar Texto Principal</button>
+            </div>
+
+            <!-- Bloco 5: Seções Sobre -->
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold text-gray-900 mb-2">Cards "Sobre"</h4>
+                <div class="space-y-2">
+                    <input type="text" id="about-design-input" class="form-input" placeholder="Texto Design">
+                    <input type="text" id="about-quality-input" class="form-input" placeholder="Texto Qualidade">
+                    <input type="text" id="about-delivery-input" class="form-input" placeholder="Texto Entrega">
+                </div>
+                <button class="btn btn-primary w-full mt-3" onclick="saveAboutContent()">Salvar Sobre</button>
+            </div>
+
+            <!-- Bloco 6: Contato WhatsApp -->
+            <div class="mb-6 border-b pb-6">
+                <h4 class="font-bold text-gray-900 mb-2">WhatsApp para Orçamentos</h4>
+                <div class="form-group">
+                    <label class="form-label">Número com DDD (apenas números)</label>
+                    <input type="text" id="whatsapp-input" class="form-input" placeholder="Ex: 5511999999999">
+                </div>
+                <button class="btn btn-primary w-full" onclick="saveContactData()">Salvar Contato</button>
             </div>
             
-            <button class="btn btn-danger w-full mt-6 text-xs" onclick="resetAllData()">⚠️ Resetar Tudo</button>
+            <!-- Reset Geral -->
+            <button class="btn btn-danger w-full text-xs" onclick="resetAllData()">⚠️ Resetar Tudo para o Padrão</button>
         </div>
     </div>
 
+    <!-- Modal de Contato / Orçamento -->
     <div class="modal-overlay" id="contact-modal">
         <div class="modal">
-            <h3 class="text-xl font-bold mb-4">Orçamento</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Solicitar Orçamento</h3>
+                <button class="text-gray-400 hover:text-gray-600 text-xl font-bold" onclick="closeContactModal()">✕</button>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Preencha seus dados para conversarmos no WhatsApp sobre o seu projeto:</p>
             <form onsubmit="handleContactSubmit(event)">
-                <input type="text" id="contact-name" class="form-input mb-3" placeholder="Seu Nome" required>
-                <textarea id="contact-message" class="form-textarea mb-3" placeholder="O que deseja encomendar?" required></textarea>
-                <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-1">Enviar para WhatsApp</button>
+                <div class="form-group">
+                    <label class="form-label">Seu Nome / Empresa</label>
+                    <input type="text" id="contact-name" class="form-input" placeholder="Ex: João da Silva" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Detalhes do Pedido</label>
+                    <textarea id="contact-message" class="form-textarea" placeholder="Ex: Gostaria de 50 chaveiros personalizados com o logo da minha empresa." required></textarea>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary flex-1">Conversar no WhatsApp 💬</button>
                     <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancelar</button>
                 </div>
             </form>
@@ -239,201 +544,438 @@
        
     <script>
         // ==========================================
-        // CONFIGURAÇÃO DO COFRE DE DADOS (GRATUITO E NATIVO)
+        // CONFIGURAÇÃO SUPABASE (BANCO E ARMAZENAMENTO)
         // ==========================================
-        // Cole aqui o link que você pegou no site kvdb.io:
-        // Configuração dos nomes que aparecem para o cliente e no Admin
-const CATEGORY_NAMES = {
-    executivos: "Brindes Executivos",
-    sustentaveis: "Brindes Ecológicos", // Mude aqui para o nome que quiser
-    tecnologicos: "Brindes Tecnológicos"
-};
-       
-        let currentGiftsSlide = 0;
-        let giftProducts = { executivos: [],
-                             sustentaveis: [],
-                             tecnologicos: []
-        };
-        
-        let siteData = {};
+        const SUPABASE_PROJECT_URL = "https://ozlhgywwlebiympbxdjt.supabase.co";
+        const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co/rest/v1/"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bGhneXd3bGViaXltcGJ4ZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTk1OTYsImV4cCI6MjA5NzI5NTU5Nn0.UBnbZ5WUkfZ0koz-XgqJNAgcg59t3Hztax0rTTk9mnQ";
 
+        // Inicializa o cliente do Supabase SDK
+        let supabaseClient = null;
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_KEY);
+        }
+
+        // Estado Global
+        let siteData = {};
+        let giftProducts = { 
+            executivos: [],
+            sustentaveis: [],
+            tecnologicos: []
+        };
+        let activeSlides = { 
+            executivos: 0, 
+            sustentaveis: 0, 
+            tecnologicos: 0 
+        };
+        let activeImageSource = 'file'; // 'file' ou 'url'
+
+        // Inicialização ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            setupDropzone();
             loadDataFromCloud();
         });
-        
-function updateCategorySelect() {
-    const select = document.getElementById('gift-category-input');
-    const titles = siteData.categoryTitles || { 
-        executivos: "Brindes Executivos", 
-        sustentaveis: "Brindes Ecológicos", 
-        tecnologicos: "Brindes Tecnológicos" 
-    };
 
-    // Salva a seleção atual
-    const currentVal = select.value;
+        // Configura Drag and Drop para envio de arquivos
+        function setupDropzone() {
+            const dropzone = document.getElementById('dropzone');
+            if (!dropzone) return;
 
-    // Limpa o select
-    select.innerHTML = '';
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
 
-    // Cria as opções baseadas nas chaves que existem no seu objeto giftProducts
-    Object.keys(giftProducts).forEach(key => {
-        const displayName = titles[key] || key; // Usa o nome amigável ou o nome técnico
-        select.innerHTML += `<option value="${key}">${displayName}</option>`;
-    });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
 
-    // Restaura a seleção
-    if(currentVal) select.value = currentVal;
-}
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length) {
+                    const input = document.getElementById('gift-file-input');
+                    input.files = files;
+                    handleFileSelect({ target: { files: files } });
+                }
+            }, false);
+        }
 
-        // Função para salvar os novos títulos no Supabase
-function saveCategoryTitles() {
-    siteData.categoryTitles = {
-        executivos: document.getElementById('title-executivos-input').value,
-        sustentaveis: document.getElementById('title-sustentaveis-input').value,
-        tecnologicos: document.getElementById('title-tecnologicos-input').value
-    };
-    updateTitles();
-    pushDataToCloud();
-    updateCategorySelect();
-    
- 
-    showToast("Títulos salvos com sucesso!");
-}
+        // Alternar entre upload de arquivo ou colar link URL
+        function setImageSource(type) {
+            activeImageSource = type;
+            const tabFile = document.getElementById('tab-upload-file');
+            const tabUrl = document.getElementById('tab-upload-url');
+            const secFile = document.getElementById('section-upload-file');
+            const secUrl = document.getElementById('section-upload-url');
+            
+            if (type === 'file') {
+                tabFile.className = "flex-1 py-2 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 transition";
+                tabUrl.className = "flex-1 py-2 text-xs font-semibold text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition";
+                secFile.classList.remove('hidden');
+                secUrl.classList.add('hidden');
+            } else {
+                tabUrl.className = "flex-1 py-2 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 transition";
+                tabFile.className = "flex-1 py-2 text-xs font-semibold text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition";
+                secUrl.classList.remove('hidden');
+                secFile.classList.add('hidden');
+            }
+        }
 
-// Função que aplica os títulos na tela
-function updateTitles() {
-    const titles = siteData.categoryTitles || { 
-        executivos: "Brindes Executivos", 
-        sustentaveis: "Brindes Sustentáveis", 
-        tecnologicos: "Brindes Tecnológicos" 
-    };
-    
-    document.getElementById('display-executivos').textContent = titles.executivos;
-    document.getElementById('display-sustentaveis').textContent = titles.sustentaveis;
-    document.getElementById('display-tecnologicos').textContent = titles.tecnologicos;
-}
+        // Manipulação da seleção de arquivo com preview imediato
+        function handleFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Selecione um arquivo de imagem válido (JPG, PNG, WEBP)', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('file-preview-img').src = e.target.result;
+                document.getElementById('file-preview-name').textContent = `${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+                document.getElementById('file-preview-container').classList.remove('hidden');
+                document.getElementById('dropzone-prompt').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSelectedFile(event) {
+            if (event) event.stopPropagation();
+            const input = document.getElementById('gift-file-input');
+            if (input) input.value = '';
+            document.getElementById('file-preview-container').classList.add('hidden');
+            document.getElementById('dropzone-prompt').classList.remove('hidden');
+            document.getElementById('file-preview-img').src = '';
+        }
+
+        function toggleStorageHelp() {
+            const content = document.getElementById('storage-help-content');
+            const icon = document.getElementById('storage-help-icon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '▲';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '▼';
+            }
+        }
+
+        // ==========================================
+        // COMPRESSÃO E UPLOAD DE IMAGENS
+        // ==========================================
+        // Otimiza e redimensiona a imagem antes do upload (economiza espaço e acelera o site)
+        function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.82) {
+            if (!file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') {
+                return Promise.resolve(file);
+            }
+
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth || height > maxHeight) {
+                            if (width > height) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            } else {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            if (blob && blob.size < file.size) {
+                                const newName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+                                resolve(new File([blob], newName, { type: 'image/webp' }));
+                            } else {
+                                resolve(file);
+                            }
+                        }, 'image/webp', quality);
+                    };
+                    img.onerror = () => resolve(file);
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => resolve(file);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function fileToDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Faz o upload persistente para o Supabase Storage com fallback automático
+        async function uploadImageFile(file) {
+            const optimizedFile = await compressImageFile(file);
+            const cleanExt = (optimizedFile.name.split('.').pop() || 'webp').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cleanName = `brinde_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${cleanExt}`;
+
+            // Tenta upload via Supabase Storage
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.storage
+                        .from('brindes')
+                        .upload(cleanName, optimizedFile, {
+                            contentType: optimizedFile.type || 'image/webp',
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (!error && data) {
+                        const { data: pubData } = supabaseClient.storage
+                            .from('brindes')
+                            .getPublicUrl(cleanName);
+                        if (pubData && pubData.publicUrl) {
+                            return pubData.publicUrl;
+                        }
+                    } else if (error) {
+                        console.warn("Aviso do Supabase Storage:", error.message || error);
+                    }
+                } catch (storageError) {
+                    console.warn("Falha de conexão com Storage:", storageError);
+                }
+            }
+
+            // Fallback resiliente: salva a imagem comprimida diretamente no banco de dados
+            console.log("Armazenando imagem otimizada de forma resiliente...");
+            return await fileToDataURL(optimizedFile);
+        }
+
+        // ==========================================
+        // CARREGAMENTO E SINCRONIZAÇÃO DE DADOS
+        // ==========================================
+        async function loadDataFromCloud() {
+            const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
+            
+            try {
+                const response = await fetch(urlFinal, {
+                    method: "GET",
+                    headers: { 
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                    
+                if (data && data.length > 0) {
+                    siteData = data[0].site_data || {};
+                    let dbGifts = data[0].gift_products;
+                    
+                    if (Array.isArray(dbGifts)) {
+                        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
+                    } else {
+                        giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
+                    }
+
+                    // Garante todas as categorias estruturadas
+                    if (!giftProducts.executivos) giftProducts.executivos = [];
+                    if (!giftProducts.sustentaveis) giftProducts.sustentaveis = [];
+                    if (!giftProducts.tecnologicos) giftProducts.tecnologicos = [];
+
+                    updateCategorySelect(); 
+                    updateTitles();
+                } else {
+                    loadFallbacks(); 
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados da nuvem:", error);
+                loadFallbacks();
+            }
+            
+            updateFrontend();
+        }
+
+        async function pushDataToCloud() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}site_config`, {
+                    method: "POST",
+                    headers: { 
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "return=minimal, resolution=merge-duplicates"
+                    },
+                    body: JSON.stringify({ 
+                        id: 1, 
+                        site_data: siteData, 
+                        gift_products: giftProducts 
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error("Erro ao sincronizar com nuvem:", error);
+                showToast("Erro ao sincronizar com a nuvem", "error");
+            }
+        }
 
         function loadFallbacks() {
             siteData = {
                 heroDescription: "Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.",
-                aboutDesign: "Design exclusivo para a sua marca.",
-                aboutQuality: "Qualidade garantida em cada peça.",
-                aboutDelivery: "Entregas rápidas e seguras.",
-                whatsapp: "5511999999999"
+                aboutDesign: "Design exclusivo e personalizado com a identidade da sua marca.",
+                aboutQuality: "Qualidade garantida em cada peça e acabamento impecável.",
+                aboutDelivery: "Entregas rápidas, pontuais e seguras para todo o país.",
+                whatsapp: "5511999999999",
+                categoryTitles: {
+                    executivos: "Brindes Executivos",
+                    sustentaveis: "Brindes Sustentáveis",
+                    tecnologicos: "Brindes Tecnológicos"
+                }
             };
-            giftProducts = [];
-        }
-  const SUPABASE_URL = "https://ozlhgywwlebiympbxdjt.supabase.co/rest/v1/"; 
-  
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96bGhneXd3bGViaXltcGJ4ZGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MTk1OTYsImV4cCI6MjA5NzI5NTU5Nn0.UBnbZ5WUkfZ0koz-XgqJNAgcg59t3Hztax0rTTk9mnQ";
-
-  
-
-    // 2. ISSO CHAMA OS DADOS ASSIM QUE A PÁGINA ABRE
-    document.addEventListener('DOMContentLoaded', function() {
-        loadDataFromCloud();
-    });
-
-    // 3. FUNÇÃO DE CARGA ATUALIZADA (Supabase)
-   async function loadDataFromCloud() {
-    // Usando a mesma URL base e o mesmo caminho que o push
-    const urlFinal = `${SUPABASE_URL}site_config?id=eq.1`;
-    
-    try {
-        const response = await fetch(urlFinal, {
-            method: "GET", // Explicitamente um GET para buscar
-            headers: { 
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${SUPABASE_KEY}`,
-                "Accept": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
         }
 
-        const data = await response.json();
-            
-        // Se o Supabase encontrar a linha, os dados estarão no array
-        // Dentro do seu loadDataFromCloud, após receber os dados:
-if (data && data.length > 0) {
-    
-    siteData = data[0].site_data;
-    
-    let dbGifts = data[0].gift_products;
-    
-    // SE FOR UM ARRAY (antigo), converte para o OBJETO (novo)
-    if (Array.isArray(dbGifts)) {
-        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
-    } else {
-        giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
-    }
-    // ADICIONE ESTA LINHA AQUI:
-        updateCategorySelect(); 
-        updateTitles();
-
-            console.log("Dados carregados do Supabase com sucesso!");
-        } else {
-            console.log("Nenhum dado encontrado, carregando valores padrão.");
-            loadFallbacks(); 
-        }
-    } catch (error) {
-        console.error("Erro ao carregar do Supabase:", error);
-        loadFallbacks(); // Em caso de erro, mantém o site funcional com padrões
-    }
-    
-    // Atualiza a tela após tentar carregar
-    updateFrontend();
-}
-async function pushDataToCloud() {
-    // LOG DE SEGURANÇA: Veja o que está a ser enviado
-    console.log("Dados a enviar:", { site_data: siteData, gift_products: giftProducts });
-
-    try {
-        const response = await fetch(`${SUPABASE_URL}site_config`, {
-            method: "POST",
-            headers: { 
-                "apikey": SUPABASE_KEY,
-                "Authorization": `Bearer ${SUPABASE_KEY}`,
-                "Content-Type": "application/json",
-                "Prefer": "return=minimal, resolution=merge-duplicates"
-            },
-            body: JSON.stringify({ 
-                id: 1, 
-                site_data: siteData, 
-                gift_products: giftProducts 
-            })
-        });
-
-        // Verifique o status com atenção
-        console.log("Resposta do Supabase:", response.status);
-    } catch (error) {
-        console.error("Erro:", error);
-    }
-}
-
+        // ==========================================
+        // ATUALIZAÇÃO DA INTERFACE DO SITE
+        // ==========================================
         function updateFrontend() {
             document.getElementById('hero-description').textContent = siteData.heroDescription || 'Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.';
             document.getElementById('about-design').textContent = siteData.aboutDesign || 'Design exclusivo para a sua marca.';
             document.getElementById('about-quality').textContent = siteData.aboutQuality || 'Qualidade garantida em cada peça.';
             document.getElementById('about-delivery').textContent = siteData.aboutDelivery || 'Entregas rápidas e seguras.';
-            document.getElementById('whatsapp-link-btn').href = `https://wa.me/${siteData.whatsapp || '5511999999999'}`;
+            
+            const whatsappNumber = siteData.whatsapp || '5511999999999';
+            document.getElementById('whatsapp-link-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá Nilson! Gostaria de informações sobre os brindes personalizados.')}`;
+            
+            renderAllCarousels();
+            updateTitles();
+        }
+
+        function renderAllCarousels() {
             renderCarousel('executivos');
-    renderCarousel('sustentaveis');
-    renderCarousel('tecnologicos');
-    updateTitles(); // Adicione isso aqui
+            renderCarousel('sustentaveis');
+            renderCarousel('tecnologicos');
+        }
+
+        function renderCarousel(category) {
+            const list = giftProducts[category] || [];
+            const container = document.getElementById(`carousel-${category}-container`);
+            const dotsContainer = document.getElementById(`carousel-${category}-dots`);
+            
+            if (!container || !dotsContainer) return;
+
+            container.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            if (!list.length) { 
+                container.innerHTML = `
+                    <div class="img-placeholder h-full flex flex-col items-center justify-center p-6 text-gray-400">
+                        <span class="text-4xl mb-2">🎁</span>
+                        <p class="font-medium text-sm">Nenhum brinde adicionado nesta categoria ainda.</p>
+                        <p class="text-xs text-gray-400 mt-1">Abra o painel admin para cadastrar novas peças.</p>
+                    </div>`; 
+                return; 
+            }
+
+            if (activeSlides[category] >= list.length) {
+                activeSlides[category] = 0;
+            }
+
+            list.forEach((g, idx) => {
+                const isActive = idx === activeSlides[category];
+                container.innerHTML += `
+                    <div class="carousel-item ${isActive ? 'active' : ''}">
+                        <div class="flex flex-col items-center justify-between w-full h-full p-4 sm:p-6 text-center">
+                            <div class="flex-1 flex items-center justify-center w-full overflow-hidden my-auto">
+                                <img src="${g.image}" alt="${g.name}" class="rounded-xl shadow-sm" style="max-height: 250px; max-width: 100%; object-fit: contain;">
+                            </div>
+                            <div class="mt-3 w-full">
+                                <h4 class="font-bold text-lg text-gray-900">${g.name}</h4>
+                                ${g.desc ? `<p class="text-sm text-gray-600 mt-1 max-w-md mx-auto line-clamp-2">${g.desc}</p>` : ''}
+                                <button onclick="requestGiftQuote('${g.name.replace(/'/g, "\\'")}')" class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-full transition shadow-sm">
+                                    <span>💬 Pedir orçamento deste brinde</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                dotsContainer.innerHTML += `
+                    <button aria-label="Slide ${idx + 1}" class="dot ${isActive ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>
+                `;
+            });
+        }
+
+        function changeSlide(category, direction) {
+            const list = giftProducts[category] || [];
+            if (!list.length) return;
+            activeSlides[category] = (activeSlides[category] + direction + list.length) % list.length;
+            renderCarousel(category);
+        }
+
+        function goToSlide(category, index) {
+            activeSlides[category] = index;
+            renderCarousel(category);
+        }
+
+        function requestGiftQuote(giftName) {
+            const phone = siteData.whatsapp || '5511999999999';
+            const message = encodeURIComponent(`Olá Nilson! Vi o brinde "${giftName}" no portfólio do site e gostaria de solicitar um orçamento.`);
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        }
+
+        // ==========================================
+        // PAINEL DE ADMINISTRAÇÃO E CADASTROS
+        // ==========================================
+        function toggleAdminPanel() { 
+            document.getElementById('admin-panel').classList.toggle('open'); 
         }
 
         function loginAdmin() {
-            if (document.getElementById('admin-password').value === 'admin123') {
+            const passwordInput = document.getElementById('admin-password');
+            if (passwordInput.value === 'admin123') {
                 document.getElementById('admin-login').style.display = 'none';
                 document.getElementById('admin-area').style.display = 'block';
+                
+                // Preenche os campos existentes
                 document.getElementById('hero-desc-input').value = siteData.heroDescription || '';
                 document.getElementById('about-design-input').value = siteData.aboutDesign || '';
                 document.getElementById('about-quality-input').value = siteData.aboutQuality || '';
                 document.getElementById('about-delivery-input').value = siteData.aboutDelivery || '';
                 document.getElementById('whatsapp-input').value = siteData.whatsapp || '';
+                
+                const titles = siteData.categoryTitles || { 
+                    executivos: "Brindes Executivos", 
+                    sustentaveis: "Brindes Sustentáveis", 
+                    tecnologicos: "Brindes Tecnológicos" 
+                };
+                document.getElementById('title-executivos-input').value = titles.executivos || '';
+                document.getElementById('title-sustentaveis-input').value = titles.sustentaveis || '';
+                document.getElementById('title-tecnologicos-input').value = titles.tecnologicos || '';
+                
                 renderGiftsList();
                 updateCategorySelect();
             } else {
@@ -441,148 +983,262 @@ async function pushDataToCloud() {
             }
         }
 
-        function saveHeroContent() { siteData.heroDescription = document.getElementById('hero-desc-input').value; updateFrontend(); pushDataToCloud(); }
+        function updateCategorySelect() {
+            const select = document.getElementById('gift-category-input');
+            if (!select) return;
+
+            const titles = siteData.categoryTitles || { 
+                executivos: "Brindes Executivos", 
+                sustentaveis: "Brindes Sustentáveis", 
+                tecnologicos: "Brindes Tecnológicos" 
+            };
+
+            const currentVal = select.value;
+            select.innerHTML = '';
+
+            Object.keys(giftProducts).forEach(key => {
+                const displayName = titles[key] || key;
+                select.innerHTML += `<option value="${key}">${displayName}</option>`;
+            });
+
+            if (currentVal && giftProducts[currentVal]) {
+                select.value = currentVal;
+            }
+        }
+
+        function updateTitles() {
+            const titles = siteData.categoryTitles || { 
+                executivos: "Brindes Executivos", 
+                sustentaveis: "Brindes Sustentáveis", 
+                tecnologicos: "Brindes Tecnológicos" 
+            };
+            
+            if (document.getElementById('display-executivos')) {
+                document.getElementById('display-executivos').textContent = titles.executivos;
+            }
+            if (document.getElementById('display-sustentaveis')) {
+                document.getElementById('display-sustentaveis').textContent = titles.sustentaveis;
+            }
+            if (document.getElementById('display-tecnologicos')) {
+                document.getElementById('display-tecnologicos').textContent = titles.tecnologicos;
+            }
+        }
+
+        // Adicionar novo brinde com upload persistente
+        async function addGift() {
+            const nameInput = document.getElementById('gift-name-input');
+            const descInput = document.getElementById('gift-desc-input');
+            const categorySelect = document.getElementById('gift-category-input');
+            const btn = document.getElementById('btn-add-gift');
+
+            const name = nameInput.value.trim();
+            const desc = descInput.value.trim();
+            const category = categorySelect.value;
+
+            if (!name) { 
+                showToast("Digite o nome do brinde!", "error"); 
+                nameInput.focus();
+                return; 
+            }
+
+            let imageUrl = '';
+
+            // Modo 1: Upload de Arquivo
+            if (activeImageSource === 'file') {
+                const fileInput = document.getElementById('gift-file-input');
+                if (!fileInput.files || !fileInput.files[0]) {
+                    showToast("Selecione uma imagem para o brinde!", "error");
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳ Enviando foto...</span>`;
+
+                try {
+                    imageUrl = await uploadImageFile(fileInput.files[0]);
+                } catch (err) {
+                    console.error("Erro no upload da imagem:", err);
+                    showToast("Erro ao processar imagem", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `Adicionar ao Carrossel`;
+                    return;
+                }
+            } 
+            // Modo 2: Link de Imagem Direto
+            else {
+                const urlInput = document.getElementById('gift-url-input');
+                imageUrl = urlInput.value.trim();
+                
+                if (!imageUrl) { 
+                    showToast("Informe a URL da imagem!", "error"); 
+                    urlInput.focus();
+                    return; 
+                }
+
+                // Ajuste inteligente para links do Imgur
+                if (imageUrl.includes("imgur.com/") && !imageUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !imageUrl.includes("i.imgur.com")) {
+                    imageUrl = imageUrl.replace("imgur.com/", "i.imgur.com/") + ".jpg";
+                }
+            }
+
+            // Garante categoria e insere o brinde
+            if (!giftProducts[category]) giftProducts[category] = [];
+            giftProducts[category].push({ 
+                id: Date.now(), 
+                name, 
+                desc, 
+                image: imageUrl 
+            });
+
+            // Reseta campos do formulário
+            nameInput.value = '';
+            descInput.value = '';
+            if (document.getElementById('gift-url-input')) {
+                document.getElementById('gift-url-input').value = '';
+            }
+            clearSelectedFile();
+
+            btn.disabled = false;
+            btn.innerHTML = `Adicionar ao Carrossel`;
+
+            // Atualiza UI e sincroniza com a nuvem
+            renderGiftsList(); 
+            renderAllCarousels(); 
+            pushDataToCloud();
+            showToast("Brinde adicionado com sucesso!");
+        }
+
+        function removeGift(category, id) {
+            if (!confirm('Deseja realmente excluir este brinde?')) return;
+
+            giftProducts[category] = (giftProducts[category] || []).filter(g => g.id !== id);
+            
+            renderCarousel(category); 
+            renderGiftsList(); 
+            pushDataToCloud();
+            showToast("Brinde removido!");
+        }
+
+        function renderGiftsList() {
+            const container = document.getElementById('gifts-list');
+            const countBadge = document.getElementById('gifts-count-badge');
+            container.innerHTML = '';
+
+            const titles = siteData.categoryTitles || { 
+                executivos: "Executivos", 
+                sustentaveis: "Sustentáveis", 
+                tecnologicos: "Tecnológicos" 
+            };
+
+            let totalCount = 0;
+
+            Object.keys(giftProducts).forEach(category => {
+                if (Array.isArray(giftProducts[category])) {
+                    giftProducts[category].forEach(g => {
+                        totalCount++;
+                        const catLabel = titles[category] || category;
+                        container.innerHTML += `
+                            <div class="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 hover:bg-gray-100 transition">
+                                <img src="${g.image}" alt="${g.name}" class="w-12 h-12 rounded-md object-cover border border-gray-300 flex-shrink-0" onerror="this.src='https://via.placeholder.com/60?text=Foto'">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-bold text-gray-800 truncate">${g.name}</div>
+                                    <div class="text-xs text-indigo-600 font-medium">${catLabel}</div>
+                                    ${g.desc ? `<div class="text-xs text-gray-500 truncate">${g.desc}</div>` : ''}
+                                </div>
+                                <button class="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition font-bold" title="Excluir brinde" onclick="removeGift('${category}', ${g.id})">
+                                    🗑️
+                                </button>
+                            </div>`;
+                    });
+                }
+            });
+
+            if (countBadge) countBadge.textContent = `${totalCount} ${totalCount === 1 ? 'item' : 'itens'}`;
+            if (totalCount === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Nenhum brinde cadastrado ainda.</div>`;
+            }
+        }
+
+        function saveCategoryTitles() {
+            siteData.categoryTitles = {
+                executivos: document.getElementById('title-executivos-input').value.trim() || "Brindes Executivos",
+                sustentaveis: document.getElementById('title-sustentaveis-input').value.trim() || "Brindes Sustentáveis",
+                tecnologicos: document.getElementById('title-tecnologicos-input').value.trim() || "Brindes Tecnológicos"
+            };
+            updateTitles();
+            pushDataToCloud();
+            updateCategorySelect();
+            renderGiftsList();
+            showToast("Títulos salvos com sucesso!");
+        }
+
+        function saveHeroContent() { 
+            siteData.heroDescription = document.getElementById('hero-desc-input').value.trim(); 
+            updateFrontend(); 
+            pushDataToCloud(); 
+            showToast("Hero atualizado!");
+        }
         
         function saveAboutContent() { 
-            siteData.aboutDesign = document.getElementById('about-design-input').value;
-            siteData.aboutQuality = document.getElementById('about-quality-input').value;
-            siteData.aboutDelivery = document.getElementById('about-delivery-input').value;
-            updateFrontend(); pushDataToCloud(); 
+            siteData.aboutDesign = document.getElementById('about-design-input').value.trim();
+            siteData.aboutQuality = document.getElementById('about-quality-input').value.trim();
+            siteData.aboutDelivery = document.getElementById('about-delivery-input').value.trim();
+            updateFrontend(); 
+            pushDataToCloud(); 
+            showToast("Seção Sobre atualizada!");
         }
 
         function saveContactData() { 
-            siteData.whatsapp = document.getElementById('whatsapp-input').value; 
-            updateFrontend(); pushDataToCloud(); 
+            siteData.whatsapp = document.getElementById('whatsapp-input').value.replace(/\D/g, ''); 
+            updateFrontend(); 
+            pushDataToCloud(); 
+            showToast("Contato WhatsApp atualizado!");
         }
-        function renderAllCarousels() {
-    renderCarousel('executivos');
-    renderCarousel('sustentaveis');
-    renderCarousel('tecnologicos');
-}
 
-function addGift() {
-    // 1. Pegar os elementos
-    const nameInput = document.getElementById('gift-name-input');
-    const descInput = document.getElementById('gift-desc-input');
-    const urlInput = document.getElementById('gift-url-input');
-    const category = document.getElementById('gift-category-input').value;
-
-    const name = nameInput.value.trim();
-    const desc = descInput.value.trim();
-    let url = urlInput.value.trim();
-    
-    if(!name || !url) { showToast("Nome e URL são obrigatórios", "error"); return; }
-    
-    // 2. Lógica do Imgur
-    if (url.includes("imgur.com/") && !url.match(/\.(jpeg|jpg|gif|png|webp)$/i) && !url.includes("i.imgur.com")) {
-        url = url.replace("imgur.com/", "i.imgur.com/") + ".jpg";
-    }
-
-    // 3. Adicionar
-    if (!giftProducts[category]) giftProducts[category] = [];
-    giftProducts[category].push({ id: Date.now(), name, desc, image: url });
-
-    // 4. LIMPEZA FORÇADA (Agora vai funcionar)
-    nameInput.value = '';
-    descInput.value = '';
-    urlInput.value = '';
-    
-    // 5. Atualizar
-    renderGiftsList(); 
-    renderAllCarousels(); 
-    pushDataToCloud();
-    showToast("Brinde adicionado com sucesso!");
-}
-
-       function removeGift(category, id) {
-    // Filtra o item dentro da lista específica daquela categoria
-    giftProducts[category] = giftProducts[category].filter(g => g.id !== id);
-    
-    // Atualiza a tela e salva na nuvem
-    renderCarousel(category); 
-    renderGiftsList(); 
-    pushDataToCloud();
-}
-function renderGiftsList() {
-    const container = document.getElementById('gifts-list');
-    container.innerHTML = '';
-
-    // Verifica se giftProducts é um objeto e não um array vazio
-   const titles = siteData.categoryTitles || { 
-        executivos: "Executivos", 
-        sustentaveis: "Sustentáveis", 
-        tecnologicos: "Tecnológicos" 
-    };
-
-    Object.keys(giftProducts).forEach(category => {
-        // Verifica se a categoria é um array antes de iterar
-        if (Array.isArray(giftProducts[category])) {
-            giftProducts[category].forEach(g => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center p-2 bg-gray-100 rounded text-sm mb-1">
-                        <span>${g.name} (${category})</span>
-                        <button class="text-red-500 font-bold" onclick="removeGift('${category}', ${g.id})">✕</button>
-                    </div>`;
-            });
+        function resetAllData() { 
+            if (confirm('⚠️ Deseja restaurar as configurações padrão de fábrica do site?')) { 
+                loadFallbacks(); 
+                updateFrontend(); 
+                pushDataToCloud(); 
+                showToast("Dados restaurados!");
+            } 
         }
-    });
-}
-// Variável global para controlar os slides de cada categoria
-let activeSlides = { executivos: 0, sustentaveis: 0, tecnologicos: 0 };
 
-function renderCarousel(category) {
-    const list = giftProducts[category] || [];
-    const container = document.getElementById(`carousel-${category}-container`);
-    const dotsContainer = document.getElementById(`carousel-${category}-dots`);
-    
-    container.innerHTML = '';
-    dotsContainer.innerHTML = '';
-
-    if(!list.length) { container.innerHTML = '<div class="img-placeholder">Sem brindes nesta categoria.</div>'; return; }
-
-    list.forEach((g, idx) => {
-        container.innerHTML += `
-            <div class="carousel-item ${idx === activeSlides[category] ? 'active' : ''}">
-                <div class="flex flex-col items-center p-4">
-<img src="${g.image}" style="max-height: 350px; object-fit: contain;">                
-                <div class="text-center mt-4">
-                        <h4 class="font-bold text-lg">${g.name}</h4>
-                        <p class="text-sm text-gray-600">${g.desc || ''}</p>
-                    </div>
-            </div>`;
-        dotsContainer.innerHTML += `<button class="dot ${idx === activeSlides[category] ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>`;
-    });
-}
-
-function changeSlide(category, direction) {
-    const list = giftProducts[category] || [];
-    activeSlides[category] = (activeSlides[category] + direction + list.length) % list.length;
-    renderCarousel(category);
-}
-
-function goToSlide(category, index) {
-    activeSlides[category] = index;
-    renderCarousel(category);
-}
-
-        function nextSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide + 1) % giftProducts.length; renderGiftsCarousel(); } }
-        function prevSlide() { if(giftProducts.length) { currentGiftsSlide = (currentGiftsSlide - 1 + giftProducts.length) % giftProducts.length; renderGiftsCarousel(); } }
-        function goToSlide(i) { currentGiftsSlide = i; renderGiftsCarousel(); }
-        
-        function openContactModal() { document.getElementById('contact-modal').classList.add('active'); }
-        function closeContactModal() { document.getElementById('contact-modal').classList.remove('active'); }
+        // ==========================================
+        // MODAL DE CONTATO E TOAST
+        // ==========================================
+        function openContactModal() { 
+            document.getElementById('contact-modal').classList.add('active'); 
+        }
+        function closeContactModal() { 
+            document.getElementById('contact-modal').classList.remove('active'); 
+        }
         
         function handleContactSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('contact-name').value;
             const msg = document.getElementById('contact-message').value;
-            window.open(`https://wa.me/${siteData.whatsapp || '5511999999999'}?text=${encodeURIComponent(`Olá, sou o ${name}. ${msg}`)}`, '_blank');
+            const phone = siteData.whatsapp || '5511999999999';
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Olá Nilson, sou ${name}! ${msg}`)}`, '_blank');
             closeContactModal();
         }
 
-        function toggleAdminPanel() { document.getElementById('admin-panel').classList.toggle('open'); }
-        function resetAllData() { if (confirm('⚠️ Deletar em definitivo todos os dados da nuvem?')) { loadFallbacks(); updateFrontend(); pushDataToCloud(); } }
-        function showToast(m, type="success") { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; if(type==="error") t.style.background = '#ef4444'; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+        function showToast(message, type = "success") { 
+            const t = document.createElement('div'); 
+            t.className = 'toast'; 
+            t.textContent = message; 
+            if (type === "error") {
+                t.style.background = '#ef4444';
+            } else if (type === "info") {
+                t.style.background = '#3b82f6';
+            }
+            document.body.appendChild(t); 
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => t.remove(), 300);
+            }, 3000); 
+        }
     </script>
 </body>
 </html>
