@@ -251,19 +251,19 @@
     <!-- Seção Sobre -->
     <section id="sobre" class="py-20 max-w-6xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-4xl mb-4">🎨</div>
-                <h4 class="text-xl font-bold mb-3 text-gray-900">Design Personalizado</h4>
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-center md:text-left">
+                <div id="display-about-icon-1" class="text-4xl mb-4">🎨</div>
+                <h4 id="display-about-title-1" class="text-xl font-bold mb-3 text-gray-900">Design Personalizado</h4>
                 <p id="about-design" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
-            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-4xl mb-4">⭐</div>
-                <h4 class="text-xl font-bold mb-3 text-gray-900">Qualidade Premium</h4>
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-center md:text-left">
+                <div id="display-about-icon-2" class="text-4xl mb-4">⭐</div>
+                <h4 id="display-about-title-2" class="text-xl font-bold mb-3 text-gray-900">Qualidade Premium</h4>
                 <p id="about-quality" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
-            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-4xl mb-4">🚀</div>
-                <h4 class="text-xl font-bold mb-3 text-gray-900">Entrega Rápida</h4>
+            <div class="p-8 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-center md:text-left">
+                <div id="display-about-icon-3" class="text-4xl mb-4">🚀</div>
+                <h4 id="display-about-title-3" class="text-xl font-bold mb-3 text-gray-900">Entrega Rápida</h4>
                 <p id="about-delivery" class="text-gray-600 leading-relaxed">A carregar...</p>
             </div>
         </div>
@@ -279,9 +279,9 @@
 
             <!-- Carrossel 1: Executivos -->
             <div class="mb-16">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h3 id="display-executivos" class="text-2xl font-bold text-gray-800">Brindes Executivos</h3>
-                    <span class="text-xs font-semibold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">Linha Executiva</span>
+                    <span id="display-tag-executivos" class="text-xs font-semibold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">Linha Executiva</span>
                 </div>
                 <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
                     <div class="carousel-container">
@@ -295,9 +295,9 @@
 
             <!-- Carrossel 2: Sustentáveis -->
             <div class="mb-16">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h3 id="display-sustentaveis" class="text-2xl font-bold text-gray-800">Brindes Sustentáveis</h3>
-                    <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">Ecológico / PLA</span>
+                    <span id="display-tag-sustentaveis" class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">Ecológico / PLA</span>
                 </div>
                 <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
                     <div class="carousel-container">
@@ -311,9 +311,9 @@
 
             <!-- Carrossel 3: Tecnológicos -->
             <div>
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h3 id="display-tecnologicos" class="text-2xl font-bold text-gray-800">Brindes Tecnológicos</h3>
-                    <span class="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Tecnologia & Inovação</span>
+                    <span id="display-tag-tecnologicos" class="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Tecnologia & Inovação</span>
                 </div>
                 <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
                     <div class="carousel-container">
@@ -464,24 +464,57 @@
                 <div id="gifts-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
             </div>
 
-            <!-- Bloco 3: Alterar Títulos das Categorias -->
+            <!-- Bloco 3: Alterar Títulos e Tags das Categorias -->
             <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold text-gray-900 mb-2">Títulos das Categorias</h4>
-                <div class="space-y-2">
-                    <div>
-                        <label class="text-xs text-gray-500 font-semibold">Categoria 1 (Executivos)</label>
-                        <input type="text" id="title-executivos-input" class="form-input" placeholder="Nome para Executivos">
+                <h4 class="font-bold text-gray-900 mb-2">Títulos e Tags dos Carrosséis</h4>
+                <p class="text-xs text-gray-500 mb-3">Personalize o título da categoria e o selo/badge que fica ao lado:</p>
+                <div class="space-y-3">
+                    <!-- Categoria 1 -->
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 1 (Executivos)</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
+                                <input type="text" id="title-executivos-input" class="form-input" placeholder="Ex: Brindes Executivos">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
+                                <input type="text" id="tag-executivos-input" class="form-input" placeholder="Ex: Linha Executiva">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs text-gray-500 font-semibold">Categoria 2 (Sustentáveis)</label>
-                        <input type="text" id="title-sustentaveis-input" class="form-input" placeholder="Nome para Sustentáveis">
+
+                    <!-- Categoria 2 -->
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 2 (Sustentáveis)</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
+                                <input type="text" id="title-sustentaveis-input" class="form-input" placeholder="Ex: Brindes Sustentáveis">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
+                                <input type="text" id="tag-sustentaveis-input" class="form-input" placeholder="Ex: Ecológico / PLA">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs text-gray-500 font-semibold">Categoria 3 (Tecnológicos)</label>
-                        <input type="text" id="title-tecnologicos-input" class="form-input" placeholder="Nome para Tecnológicos">
+
+                    <!-- Categoria 3 -->
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 3 (Tecnológicos)</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
+                                <input type="text" id="title-tecnologicos-input" class="form-input" placeholder="Ex: Brindes Tecnológicos">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
+                                <input type="text" id="tag-tecnologicos-input" class="form-input" placeholder="Ex: Tecnologia & Inovação">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-primary w-full mt-3" onclick="saveCategoryTitles()">Salvar Títulos</button>
+                <button class="btn btn-primary w-full mt-3" onclick="saveCategoryTitles()">Salvar Títulos e Tags</button>
             </div>
 
             <!-- Bloco 4: Hero Texto -->
@@ -493,13 +526,61 @@
 
             <!-- Bloco 5: Seções Sobre -->
             <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold text-gray-900 mb-2">Cards "Sobre"</h4>
-                <div class="space-y-2">
-                    <input type="text" id="about-design-input" class="form-input" placeholder="Texto Design">
-                    <input type="text" id="about-quality-input" class="form-input" placeholder="Texto Qualidade">
-                    <input type="text" id="about-delivery-input" class="form-input" placeholder="Texto Entrega">
+                <h4 class="font-bold text-gray-900 mb-2">Cards da Seção "Sobre"</h4>
+                <p class="text-xs text-gray-500 mb-3">Edite os ícones (emojis), títulos e descrições dos 3 blocos:</p>
+
+                <!-- Card 1 -->
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 mb-3">
+                    <div class="font-semibold text-xs text-gray-700 mb-2">Card 1</div>
+                    <div class="grid grid-cols-4 gap-2 mb-2">
+                        <div class="col-span-1">
+                            <label class="text-[11px] text-gray-500 block mb-1">Ícone</label>
+                            <input type="text" id="about-icon-1-input" class="form-input text-center text-lg" placeholder="🎨">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[11px] text-gray-500 block mb-1">Título</label>
+                            <input type="text" id="about-title-1-input" class="form-input" placeholder="Ex: Design Personalizado">
+                        </div>
+                    </div>
+                    <label class="text-[11px] text-gray-500 block mb-1">Descrição</label>
+                    <textarea id="about-desc-1-input" class="form-input" style="min-height: 55px;" placeholder="Texto descritivo"></textarea>
                 </div>
-                <button class="btn btn-primary w-full mt-3" onclick="saveAboutContent()">Salvar Sobre</button>
+
+                <!-- Card 2 -->
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 mb-3">
+                    <div class="font-semibold text-xs text-gray-700 mb-2">Card 2</div>
+                    <div class="grid grid-cols-4 gap-2 mb-2">
+                        <div class="col-span-1">
+                            <label class="text-[11px] text-gray-500 block mb-1">Ícone</label>
+                            <input type="text" id="about-icon-2-input" class="form-input text-center text-lg" placeholder="⭐">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[11px] text-gray-500 block mb-1">Título</label>
+                            <input type="text" id="about-title-2-input" class="form-input" placeholder="Ex: Qualidade Premium">
+                        </div>
+                    </div>
+                    <label class="text-[11px] text-gray-500 block mb-1">Descrição</label>
+                    <textarea id="about-desc-2-input" class="form-input" style="min-height: 55px;" placeholder="Texto descritivo"></textarea>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 mb-3">
+                    <div class="font-semibold text-xs text-gray-700 mb-2">Card 3</div>
+                    <div class="grid grid-cols-4 gap-2 mb-2">
+                        <div class="col-span-1">
+                            <label class="text-[11px] text-gray-500 block mb-1">Ícone</label>
+                            <input type="text" id="about-icon-3-input" class="form-input text-center text-lg" placeholder="🚀">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[11px] text-gray-500 block mb-1">Título</label>
+                            <input type="text" id="about-title-3-input" class="form-input" placeholder="Ex: Entrega Rápida">
+                        </div>
+                    </div>
+                    <label class="text-[11px] text-gray-500 block mb-1">Descrição</label>
+                    <textarea id="about-desc-3-input" class="form-input" style="min-height: 55px;" placeholder="Texto descritivo"></textarea>
+                </div>
+
+                <button class="btn btn-primary w-full" onclick="saveAboutContent()">Salvar Seção Sobre</button>
             </div>
 
             <!-- Bloco 6: Contato WhatsApp -->
@@ -846,14 +927,33 @@
         function loadFallbacks() {
             siteData = {
                 heroDescription: "Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.",
-                aboutDesign: "Design exclusivo e personalizado com a identidade da sua marca.",
-                aboutQuality: "Qualidade garantida em cada peça e acabamento impecável.",
-                aboutDelivery: "Entregas rápidas, pontuais e seguras para todo o país.",
                 whatsapp: "5511999999999",
                 categoryTitles: {
                     executivos: "Brindes Executivos",
                     sustentaveis: "Brindes Sustentáveis",
                     tecnologicos: "Brindes Tecnológicos"
+                },
+                categoryTags: {
+                    executivos: "Linha Executiva",
+                    sustentaveis: "Ecológico / PLA",
+                    tecnologicos: "Tecnologia & Inovação"
+                },
+                aboutCards: {
+                    card1: {
+                        icon: "🎨",
+                        title: "Design Personalizado",
+                        desc: "Design exclusivo e personalizado com a identidade da sua marca."
+                    },
+                    card2: {
+                        icon: "⭐",
+                        title: "Qualidade Premium",
+                        desc: "Qualidade garantida em cada peça e acabamento impecável."
+                    },
+                    card3: {
+                        icon: "🚀",
+                        title: "Entrega Rápida",
+                        desc: "Entregas rápidas, pontuais e seguras para todo o país."
+                    }
                 }
             };
             giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
@@ -864,10 +964,25 @@
         // ==========================================
         function updateFrontend() {
             document.getElementById('hero-description').textContent = siteData.heroDescription || 'Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.';
-            document.getElementById('about-design').textContent = siteData.aboutDesign || 'Design exclusivo para a sua marca.';
-            document.getElementById('about-quality').textContent = siteData.aboutQuality || 'Qualidade garantida em cada peça.';
-            document.getElementById('about-delivery').textContent = siteData.aboutDelivery || 'Entregas rápidas e seguras.';
             
+            // Atualiza cards Sobre (ícones, títulos e textos)
+            const about = siteData.aboutCards || {};
+            const card1 = about.card1 || { icon: "🎨", title: "Design Personalizado", desc: siteData.aboutDesign || "Design exclusivo para a sua marca." };
+            const card2 = about.card2 || { icon: "⭐", title: "Qualidade Premium", desc: siteData.aboutQuality || "Qualidade garantida em cada peça." };
+            const card3 = about.card3 || { icon: "🚀", title: "Entrega Rápida", desc: siteData.aboutDelivery || "Entregas rápidas e seguras." };
+
+            if (document.getElementById('display-about-icon-1')) document.getElementById('display-about-icon-1').textContent = card1.icon || '🎨';
+            if (document.getElementById('display-about-title-1')) document.getElementById('display-about-title-1').textContent = card1.title || 'Design Personalizado';
+            if (document.getElementById('about-design')) document.getElementById('about-design').textContent = card1.desc || '';
+
+            if (document.getElementById('display-about-icon-2')) document.getElementById('display-about-icon-2').textContent = card2.icon || '⭐';
+            if (document.getElementById('display-about-title-2')) document.getElementById('display-about-title-2').textContent = card2.title || 'Qualidade Premium';
+            if (document.getElementById('about-quality')) document.getElementById('about-quality').textContent = card2.desc || '';
+
+            if (document.getElementById('display-about-icon-3')) document.getElementById('display-about-icon-3').textContent = card3.icon || '🚀';
+            if (document.getElementById('display-about-title-3')) document.getElementById('display-about-title-3').textContent = card3.title || 'Entrega Rápida';
+            if (document.getElementById('about-delivery')) document.getElementById('about-delivery').textContent = card3.desc || '';
+
             const whatsappNumber = siteData.whatsapp || '5511999999999';
             document.getElementById('whatsapp-link-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá Nilson! Gostaria de informações sobre os brindes personalizados.')}`;
             
@@ -960,21 +1075,47 @@
                 document.getElementById('admin-login').style.display = 'none';
                 document.getElementById('admin-area').style.display = 'block';
                 
-                // Preenche os campos existentes
+                // Preenche hero e contato
                 document.getElementById('hero-desc-input').value = siteData.heroDescription || '';
-                document.getElementById('about-design-input').value = siteData.aboutDesign || '';
-                document.getElementById('about-quality-input').value = siteData.aboutQuality || '';
-                document.getElementById('about-delivery-input').value = siteData.aboutDelivery || '';
                 document.getElementById('whatsapp-input').value = siteData.whatsapp || '';
                 
+                // Preenche títulos e tags dos carrosséis
                 const titles = siteData.categoryTitles || { 
                     executivos: "Brindes Executivos", 
                     sustentaveis: "Brindes Sustentáveis", 
                     tecnologicos: "Brindes Tecnológicos" 
                 };
+                const tags = siteData.categoryTags || {
+                    executivos: "Linha Executiva",
+                    sustentaveis: "Ecológico / PLA",
+                    tecnologicos: "Tecnologia & Inovação"
+                };
+
                 document.getElementById('title-executivos-input').value = titles.executivos || '';
                 document.getElementById('title-sustentaveis-input').value = titles.sustentaveis || '';
                 document.getElementById('title-tecnologicos-input').value = titles.tecnologicos || '';
+
+                document.getElementById('tag-executivos-input').value = tags.executivos || '';
+                document.getElementById('tag-sustentaveis-input').value = tags.sustentaveis || '';
+                document.getElementById('tag-tecnologicos-input').value = tags.tecnologicos || '';
+
+                // Preenche cards Sobre (ícones, títulos e textos)
+                const about = siteData.aboutCards || {};
+                const card1 = about.card1 || { icon: "🎨", title: "Design Personalizado", desc: siteData.aboutDesign || "" };
+                const card2 = about.card2 || { icon: "⭐", title: "Qualidade Premium", desc: siteData.aboutQuality || "" };
+                const card3 = about.card3 || { icon: "🚀", title: "Entrega Rápida", desc: siteData.aboutDelivery || "" };
+
+                document.getElementById('about-icon-1-input').value = card1.icon || '🎨';
+                document.getElementById('about-title-1-input').value = card1.title || 'Design Personalizado';
+                document.getElementById('about-desc-1-input').value = card1.desc || '';
+
+                document.getElementById('about-icon-2-input').value = card2.icon || '⭐';
+                document.getElementById('about-title-2-input').value = card2.title || 'Qualidade Premium';
+                document.getElementById('about-desc-2-input').value = card2.desc || '';
+
+                document.getElementById('about-icon-3-input').value = card3.icon || '🚀';
+                document.getElementById('about-title-3-input').value = card3.title || 'Entrega Rápida';
+                document.getElementById('about-desc-3-input').value = card3.desc || '';
                 
                 renderGiftsList();
                 updateCategorySelect();
@@ -1012,15 +1153,31 @@
                 sustentaveis: "Brindes Sustentáveis", 
                 tecnologicos: "Brindes Tecnológicos" 
             };
+
+            const tags = siteData.categoryTags || {
+                executivos: "Linha Executiva",
+                sustentaveis: "Ecológico / PLA",
+                tecnologicos: "Tecnologia & Inovação"
+            };
             
             if (document.getElementById('display-executivos')) {
-                document.getElementById('display-executivos').textContent = titles.executivos;
+                document.getElementById('display-executivos').textContent = titles.executivos || "Brindes Executivos";
             }
             if (document.getElementById('display-sustentaveis')) {
-                document.getElementById('display-sustentaveis').textContent = titles.sustentaveis;
+                document.getElementById('display-sustentaveis').textContent = titles.sustentaveis || "Brindes Sustentáveis";
             }
             if (document.getElementById('display-tecnologicos')) {
-                document.getElementById('display-tecnologicos').textContent = titles.tecnologicos;
+                document.getElementById('display-tecnologicos').textContent = titles.tecnologicos || "Brindes Tecnológicos";
+            }
+
+            if (document.getElementById('display-tag-executivos')) {
+                document.getElementById('display-tag-executivos').textContent = tags.executivos || "Linha Executiva";
+            }
+            if (document.getElementById('display-tag-sustentaveis')) {
+                document.getElementById('display-tag-sustentaveis').textContent = tags.sustentaveis || "Ecológico / PLA";
+            }
+            if (document.getElementById('display-tag-tecnologicos')) {
+                document.getElementById('display-tag-tecnologicos').textContent = tags.tecnologicos || "Tecnologia & Inovação";
             }
         }
 
@@ -1165,11 +1322,16 @@
                 sustentaveis: document.getElementById('title-sustentaveis-input').value.trim() || "Brindes Sustentáveis",
                 tecnologicos: document.getElementById('title-tecnologicos-input').value.trim() || "Brindes Tecnológicos"
             };
+            siteData.categoryTags = {
+                executivos: document.getElementById('tag-executivos-input').value.trim() || "Linha Executiva",
+                sustentaveis: document.getElementById('tag-sustentaveis-input').value.trim() || "Ecológico / PLA",
+                tecnologicos: document.getElementById('tag-tecnologicos-input').value.trim() || "Tecnologia & Inovação"
+            };
             updateTitles();
             pushDataToCloud();
             updateCategorySelect();
             renderGiftsList();
-            showToast("Títulos salvos com sucesso!");
+            showToast("Títulos e tags salvos com sucesso!");
         }
 
         function saveHeroContent() { 
@@ -1180,9 +1342,28 @@
         }
         
         function saveAboutContent() { 
-            siteData.aboutDesign = document.getElementById('about-design-input').value.trim();
-            siteData.aboutQuality = document.getElementById('about-quality-input').value.trim();
-            siteData.aboutDelivery = document.getElementById('about-delivery-input').value.trim();
+            siteData.aboutCards = {
+                card1: {
+                    icon: document.getElementById('about-icon-1-input').value.trim() || '🎨',
+                    title: document.getElementById('about-title-1-input').value.trim() || 'Design Personalizado',
+                    desc: document.getElementById('about-desc-1-input').value.trim()
+                },
+                card2: {
+                    icon: document.getElementById('about-icon-2-input').value.trim() || '⭐',
+                    title: document.getElementById('about-title-2-input').value.trim() || 'Qualidade Premium',
+                    desc: document.getElementById('about-desc-2-input').value.trim()
+                },
+                card3: {
+                    icon: document.getElementById('about-icon-3-input').value.trim() || '🚀',
+                    title: document.getElementById('about-title-3-input').value.trim() || 'Entrega Rápida',
+                    desc: document.getElementById('about-desc-3-input').value.trim()
+                }
+            };
+            // Retrocompatibilidade
+            siteData.aboutDesign = siteData.aboutCards.card1.desc;
+            siteData.aboutQuality = siteData.aboutCards.card2.desc;
+            siteData.aboutDelivery = siteData.aboutCards.card3.desc;
+
             updateFrontend(); 
             pushDataToCloud(); 
             showToast("Seção Sobre atualizada!");
