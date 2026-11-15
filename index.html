@@ -364,7 +364,7 @@
         </div>
     </section>
 
-    <!-- Seção Portfólio de Brindes (Carrosséis) -->
+    <!-- Seção Portfólio de Brindes (Carrosséis Dinâmicos) -->
     <section id="brindes" class="py-20 bg-gray-50 border-t border-b border-gray-200">
         <div class="max-w-4xl mx-auto px-4">
             <div class="text-center mb-16">
@@ -372,52 +372,9 @@
                 <p class="text-gray-600 max-w-xl mx-auto">Explore nossos brindes exclusivos fabricados em impressão 3D de alta precisão.</p>
             </div>
 
-            <!-- Carrossel 1: Executivos -->
-            <div class="mb-16">
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h3 id="display-executivos" class="text-2xl font-bold text-gray-800">Brindes Executivos</h3>
-                    <span id="display-tag-executivos" class="text-xs font-semibold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">Linha Executiva</span>
-                </div>
-                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
-                    <div class="carousel-container">
-                        <div id="carousel-executivos-container" style="width:100%; height:100%;"></div>
-                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('executivos', -1)">❮</button>
-                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('executivos', 1)">❯</button>
-                    </div>
-                    <div id="carousel-executivos-dots" class="carousel-dots"></div>
-                </div>
-            </div>
-
-            <!-- Carrossel 2: Sustentáveis -->
-            <div class="mb-16">
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h3 id="display-sustentaveis" class="text-2xl font-bold text-gray-800">Brindes Sustentáveis</h3>
-                    <span id="display-tag-sustentaveis" class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">Ecológico / PLA</span>
-                </div>
-                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
-                    <div class="carousel-container">
-                        <div id="carousel-sustentaveis-container" style="width:100%; height:100%;"></div>
-                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('sustentaveis', -1)">❮</button>
-                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('sustentaveis', 1)">❯</button>
-                    </div>
-                    <div id="carousel-sustentaveis-dots" class="carousel-dots"></div>
-                </div>
-            </div>
-
-            <!-- Carrossel 3: Tecnológicos -->
-            <div>
-                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h3 id="display-tecnologicos" class="text-2xl font-bold text-gray-800">Brindes Tecnológicos</h3>
-                    <span id="display-tag-tecnologicos" class="text-xs font-semibold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Tecnologia & Inovação</span>
-                </div>
-                <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
-                    <div class="carousel-container">
-                        <div id="carousel-tecnologicos-container" style="width:100%; height:100%;"></div>
-                        <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('tecnologicos', -1)">❮</button>
-                        <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('tecnologicos', 1)">❯</button>
-                    </div>
-                    <div id="carousel-tecnologicos-dots" class="carousel-dots"></div>
-                </div>
+            <!-- Container Dinâmico de Carrosséis -->
+            <div id="dynamic-carousels-container" class="space-y-16">
+                <!-- Gerado dinamicamente via JavaScript -->
             </div>
         </div>
     </section>
@@ -559,57 +516,36 @@
                 <div id="gifts-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
             </div>
 
-            <!-- Bloco 3: Alterar Títulos e Tags das Categorias -->
+            <!-- Bloco 3: Gerenciar Carrosséis (Dinâmico) -->
             <div class="mb-6 border-b pb-6">
-                <h4 class="font-bold text-gray-900 mb-2">Títulos e Tags dos Carrosséis</h4>
-                <p class="text-xs text-gray-500 mb-3">Personalize o título da categoria e o selo/badge que fica ao lado:</p>
-                <div class="space-y-3">
-                    <!-- Categoria 1 -->
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 1 (Executivos)</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
-                                <input type="text" id="title-executivos-input" class="form-input" placeholder="Ex: Brindes Executivos">
-                            </div>
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
-                                <input type="text" id="tag-executivos-input" class="form-input" placeholder="Ex: Linha Executiva">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Categoria 2 -->
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 2 (Sustentáveis)</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
-                                <input type="text" id="title-sustentaveis-input" class="form-input" placeholder="Ex: Brindes Sustentáveis">
-                            </div>
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
-                                <input type="text" id="tag-sustentaveis-input" class="form-input" placeholder="Ex: Ecológico / PLA">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Categoria 3 -->
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="font-semibold text-xs text-gray-700 mb-2">Carrossel 3 (Tecnológicos)</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Título do Carrossel</label>
-                                <input type="text" id="title-tecnologicos-input" class="form-input" placeholder="Ex: Brindes Tecnológicos">
-                            </div>
-                            <div>
-                                <label class="text-[11px] text-gray-500 block mb-1">Tag / Selo (Badge)</label>
-                                <input type="text" id="tag-tecnologicos-input" class="form-input" placeholder="Ex: Tecnologia & Inovação">
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-gray-900">Gerenciar Carrosséis</h4>
+                    <span id="admin-categories-count" class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">0 carrosséis</span>
                 </div>
-                <button class="btn btn-primary w-full mt-3" onclick="saveCategoryTitles()">Salvar Títulos e Tags</button>
+                <p class="text-xs text-gray-500 mb-3">Adicione, edite, ordene ou exclua carrosséis do seu site livremente:</p>
+                
+                <!-- Lista de Carrosséis Cadastrados -->
+                <div id="admin-categories-list" class="space-y-2 mb-4"></div>
+
+                <!-- Formulário para Criar Novo Carrossel -->
+                <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+                    <div class="font-bold text-xs text-indigo-900 mb-2 flex items-center gap-1">
+                        <span>➕ Adicionar Novo Carrossel</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <div>
+                            <label class="text-[11px] text-gray-600 block mb-1">Título do Carrossel *</label>
+                            <input type="text" id="new-cat-title-input" class="form-input text-xs" placeholder="Ex: Linha Gamer 3D">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-gray-600 block mb-1">Tag / Selo (Badge)</label>
+                            <input type="text" id="new-cat-tag-input" class="form-input text-xs" placeholder="Ex: Novidade">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-full text-xs py-2 shadow-sm font-semibold" onclick="addCategory()">
+                        Criar Carrossel
+                    </button>
+                </div>
             </div>
 
             <!-- Bloco 4: Hero Texto -->
@@ -773,6 +709,38 @@
                     Salvar Alterações
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="closeEditGiftModal()">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Carrossel -->
+    <div class="modal-overlay" id="edit-category-modal">
+        <div class="modal" style="max-width: 440px;">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">✏️ Editar Carrossel</h3>
+                    <p class="text-xs text-gray-500">Altere o título e a tag deste carrossel</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 text-xl font-bold" onclick="closeEditCategoryModal()">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Título do Carrossel *</label>
+                <input type="text" id="edit-cat-title-input" class="form-input" placeholder="Ex: Brindes Executivos">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tag / Selo (Badge)</label>
+                <input type="text" id="edit-cat-tag-input" class="form-input" placeholder="Ex: Linha Executiva">
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button class="btn btn-primary flex-1 shadow" onclick="saveCategoryEdit()">
+                    Salvar Alterações
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditCategoryModal()">
                     Cancelar
                 </button>
             </div>
@@ -1031,18 +999,18 @@
                     let dbGifts = data[0].gift_products;
                     
                     if (Array.isArray(dbGifts)) {
-                        giftProducts = { executivos: [], sustentaveis: [], tecnologicos: [] };
+                        giftProducts = {};
                     } else {
-                        giftProducts = dbGifts || { executivos: [], sustentaveis: [], tecnologicos: [] };
+                        giftProducts = dbGifts || {};
                     }
 
-                    // Garante todas as categorias estruturadas
-                    if (!giftProducts.executivos) giftProducts.executivos = [];
-                    if (!giftProducts.sustentaveis) giftProducts.sustentaveis = [];
-                    if (!giftProducts.tecnologicos) giftProducts.tecnologicos = [];
+                    // Garante que todas as categorias registradas tenham um array em giftProducts
+                    const categories = getCategoriesList();
+                    categories.forEach(cat => {
+                        if (!giftProducts[cat.id]) giftProducts[cat.id] = [];
+                    });
 
                     updateCategorySelect(); 
-                    updateTitles();
                 } else {
                     loadFallbacks(); 
                 }
@@ -1084,6 +1052,11 @@
             siteData = {
                 heroDescription: "Transforme suas ideias em produtos únicos com impressão 3D de alta qualidade.",
                 whatsapp: "5511999999999",
+                categories: [
+                    { id: "executivos", title: "Brindes Executivos", tag: "Linha Executiva" },
+                    { id: "sustentaveis", title: "Brindes Sustentáveis", tag: "Ecológico / PLA" },
+                    { id: "tecnologicos", title: "Brindes Tecnológicos", tag: "Tecnologia & Inovação" }
+                ],
                 categoryTitles: {
                     executivos: "Brindes Executivos",
                     sustentaveis: "Brindes Sustentáveis",
@@ -1116,6 +1089,56 @@
         }
 
         // ==========================================
+        // CONFIGURAÇÃO DE CARROSSÉIS DINÂMICOS
+        // ==========================================
+        const BADGE_COLOR_CLASSES = [
+            { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+            { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+            { bg: 'bg-blue-100', text: 'text-blue-700' },
+            { bg: 'bg-purple-100', text: 'text-purple-700' },
+            { bg: 'bg-amber-100', text: 'text-amber-700' },
+            { bg: 'bg-rose-100', text: 'text-rose-700' },
+            { bg: 'bg-teal-100', text: 'text-teal-700' },
+            { bg: 'bg-orange-100', text: 'text-orange-700' }
+        ];
+
+        function getCategoriesList() {
+            if (siteData.categories && Array.isArray(siteData.categories) && siteData.categories.length > 0) {
+                return siteData.categories;
+            }
+            // Migração transparente de dados legados
+            const titles = siteData.categoryTitles || { 
+                executivos: "Brindes Executivos", 
+                sustentaveis: "Brindes Sustentáveis", 
+                tecnologicos: "Brindes Tecnológicos" 
+            };
+            const tags = siteData.categoryTags || {
+                executivos: "Linha Executiva",
+                sustentaveis: "Ecológico / PLA",
+                tecnologicos: "Tecnologia & Inovação"
+            };
+
+            const list = Object.keys(titles).map(id => ({
+                id: id,
+                title: titles[id] || id,
+                tag: tags[id] || "Destaque"
+            }));
+
+            siteData.categories = list;
+            return list;
+        }
+
+        function syncLegacyCategoryMaps() {
+            const list = getCategoriesList();
+            siteData.categoryTitles = {};
+            siteData.categoryTags = {};
+            list.forEach(c => {
+                siteData.categoryTitles[c.id] = c.title;
+                siteData.categoryTags[c.id] = c.tag;
+            });
+        }
+
+        // ==========================================
         // ATUALIZAÇÃO DA INTERFACE DO SITE
         // ==========================================
         function updateFrontend() {
@@ -1143,13 +1166,50 @@
             document.getElementById('whatsapp-link-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá Nilson! Gostaria de informações sobre os brindes personalizados.')}`;
             
             renderAllCarousels();
-            updateTitles();
         }
 
         function renderAllCarousels() {
-            renderCarousel('executivos');
-            renderCarousel('sustentaveis');
-            renderCarousel('tecnologicos');
+            const container = document.getElementById('dynamic-carousels-container');
+            if (!container) return;
+
+            const categories = getCategoriesList();
+
+            if (categories.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-10 text-center border border-gray-200 shadow-sm">
+                        <span class="text-4xl mb-3 block">📦</span>
+                        <h4 class="text-lg font-bold text-gray-800">Nenhum carrossel cadastrado</h4>
+                        <p class="text-sm text-gray-500 mt-1">Acesse o painel administrativo para adicionar carrosséis de produtos.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            categories.forEach((cat, index) => {
+                const colorClass = BADGE_COLOR_CLASSES[index % BADGE_COLOR_CLASSES.length];
+                const block = document.createElement('div');
+                block.className = 'carousel-category-block';
+                block.innerHTML = `
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 id="display-${cat.id}" class="text-2xl font-bold text-gray-800">${cat.title}</h3>
+                        <span id="display-tag-${cat.id}" class="text-xs font-semibold px-3 py-1 ${colorClass.bg} ${colorClass.text} rounded-full">${cat.tag}</span>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-md p-3 sm:p-4 border border-gray-200">
+                        <div class="carousel-container">
+                            <div id="carousel-${cat.id}-container" style="width:100%; height:100%;"></div>
+                            <button aria-label="Anterior" class="carousel-btn prev" onclick="changeSlide('${cat.id}', -1)">❮</button>
+                            <button aria-label="Próximo" class="carousel-btn next" onclick="changeSlide('${cat.id}', 1)">❯</button>
+                        </div>
+                        <div id="carousel-${cat.id}-dots" class="carousel-dots"></div>
+                    </div>
+                `;
+                container.appendChild(block);
+
+                // Renderiza os slides desse carrossel
+                renderCarousel(cat.id);
+            });
         }
 
         function renderCarousel(category) {
@@ -1260,6 +1320,7 @@
                 closeImageLightbox();
                 closeContactModal();
                 closeEditGiftModal();
+                closeEditCategoryModal();
             }
         });
 
@@ -1280,26 +1341,6 @@
                 document.getElementById('hero-desc-input').value = siteData.heroDescription || '';
                 document.getElementById('whatsapp-input').value = siteData.whatsapp || '';
                 
-                // Preenche títulos e tags dos carrosséis
-                const titles = siteData.categoryTitles || { 
-                    executivos: "Brindes Executivos", 
-                    sustentaveis: "Brindes Sustentáveis", 
-                    tecnologicos: "Brindes Tecnológicos" 
-                };
-                const tags = siteData.categoryTags || {
-                    executivos: "Linha Executiva",
-                    sustentaveis: "Ecológico / PLA",
-                    tecnologicos: "Tecnologia & Inovação"
-                };
-
-                document.getElementById('title-executivos-input').value = titles.executivos || '';
-                document.getElementById('title-sustentaveis-input').value = titles.sustentaveis || '';
-                document.getElementById('title-tecnologicos-input').value = titles.tecnologicos || '';
-
-                document.getElementById('tag-executivos-input').value = tags.executivos || '';
-                document.getElementById('tag-sustentaveis-input').value = tags.sustentaveis || '';
-                document.getElementById('tag-tecnologicos-input').value = tags.tecnologicos || '';
-
                 // Preenche cards Sobre (ícones, títulos e textos)
                 const about = siteData.aboutCards || {};
                 const card1 = about.card1 || { icon: "🎨", title: "Design Personalizado", desc: siteData.aboutDesign || "" };
@@ -1318,6 +1359,7 @@
                 document.getElementById('about-title-3-input').value = card3.title || 'Entrega Rápida';
                 document.getElementById('about-desc-3-input').value = card3.desc || '';
                 
+                renderAdminCategoriesList();
                 renderGiftsList();
                 updateCategorySelect();
             } else {
@@ -1329,57 +1371,21 @@
             const select = document.getElementById('gift-category-input');
             if (!select) return;
 
-            const titles = siteData.categoryTitles || { 
-                executivos: "Brindes Executivos", 
-                sustentaveis: "Brindes Sustentáveis", 
-                tecnologicos: "Brindes Tecnológicos" 
-            };
-
+            const categories = getCategoriesList();
             const currentVal = select.value;
             select.innerHTML = '';
 
-            Object.keys(giftProducts).forEach(key => {
-                const displayName = titles[key] || key;
-                select.innerHTML += `<option value="${key}">${displayName}</option>`;
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.title}</option>`;
             });
 
-            if (currentVal && giftProducts[currentVal]) {
+            if (currentVal && categories.some(c => c.id === currentVal)) {
                 select.value = currentVal;
             }
         }
 
         function updateTitles() {
-            const titles = siteData.categoryTitles || { 
-                executivos: "Brindes Executivos", 
-                sustentaveis: "Brindes Sustentáveis", 
-                tecnologicos: "Brindes Tecnológicos" 
-            };
-
-            const tags = siteData.categoryTags || {
-                executivos: "Linha Executiva",
-                sustentaveis: "Ecológico / PLA",
-                tecnologicos: "Tecnologia & Inovação"
-            };
-            
-            if (document.getElementById('display-executivos')) {
-                document.getElementById('display-executivos').textContent = titles.executivos || "Brindes Executivos";
-            }
-            if (document.getElementById('display-sustentaveis')) {
-                document.getElementById('display-sustentaveis').textContent = titles.sustentaveis || "Brindes Sustentáveis";
-            }
-            if (document.getElementById('display-tecnologicos')) {
-                document.getElementById('display-tecnologicos').textContent = titles.tecnologicos || "Brindes Tecnológicos";
-            }
-
-            if (document.getElementById('display-tag-executivos')) {
-                document.getElementById('display-tag-executivos').textContent = tags.executivos || "Linha Executiva";
-            }
-            if (document.getElementById('display-tag-sustentaveis')) {
-                document.getElementById('display-tag-sustentaveis').textContent = tags.sustentaveis || "Ecológico / PLA";
-            }
-            if (document.getElementById('display-tag-tecnologicos')) {
-                document.getElementById('display-tag-tecnologicos').textContent = tags.tecnologicos || "Tecnologia & Inovação";
-            }
+            renderAllCarousels();
         }
 
         // Adicionar novo brinde com upload persistente
@@ -1502,15 +1508,10 @@
             // Popula os carrosséis disponíveis no select
             const select = document.getElementById('edit-gift-category-input');
             select.innerHTML = '';
-            const titles = siteData.categoryTitles || { 
-                executivos: "Brindes Executivos", 
-                sustentaveis: "Brindes Sustentáveis", 
-                tecnologicos: "Brindes Tecnológicos" 
-            };
-            Object.keys(giftProducts).forEach(key => {
-                const displayName = titles[key] || key;
-                const isSelected = key === category ? 'selected' : '';
-                select.innerHTML += `<option value="${key}" ${isSelected}>${displayName}</option>`;
+            const categories = getCategoriesList();
+            categories.forEach(cat => {
+                const isSelected = cat.id === category ? 'selected' : '';
+                select.innerHTML += `<option value="${cat.id}" ${isSelected}>${cat.title}</option>`;
             });
 
             document.getElementById('edit-gift-modal').classList.add('active');
@@ -1603,38 +1604,31 @@
             const countBadge = document.getElementById('gifts-count-badge');
             container.innerHTML = '';
 
-            const titles = siteData.categoryTitles || { 
-                executivos: "Executivos", 
-                sustentaveis: "Sustentáveis", 
-                tecnologicos: "Tecnológicos" 
-            };
-
+            const categories = getCategoriesList();
             let totalCount = 0;
 
-            Object.keys(giftProducts).forEach(category => {
-                if (Array.isArray(giftProducts[category])) {
-                    giftProducts[category].forEach(g => {
-                        totalCount++;
-                        const catLabel = titles[category] || category;
-                        container.innerHTML += `
-                            <div class="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 hover:bg-gray-100 transition">
-                                <img src="${g.image}" alt="${g.name}" class="w-12 h-12 rounded-md object-cover border border-gray-300 flex-shrink-0 cursor-pointer hover:opacity-80" onclick="openEditGiftModal('${category}', ${g.id})" title="Clique para editar" onerror="this.src='https://via.placeholder.com/60?text=Foto'">
-                                <div class="flex-1 min-w-0">
-                                    <div class="font-bold text-gray-800 truncate">${g.name}</div>
-                                    <div class="text-xs text-indigo-600 font-medium">${catLabel}</div>
-                                    ${g.desc ? `<div class="text-xs text-gray-500 truncate">${g.desc}</div>` : ''}
-                                </div>
-                                <div class="flex items-center gap-1 flex-shrink-0">
-                                    <button class="text-indigo-600 hover:text-indigo-800 p-2 rounded hover:bg-indigo-50 transition font-bold" title="Editar textos e categoria" onclick="openEditGiftModal('${category}', ${g.id})">
-                                        ✏️
-                                    </button>
-                                    <button class="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition font-bold" title="Excluir brinde" onclick="removeGift('${category}', ${g.id})">
-                                        🗑️
-                                    </button>
-                                </div>
-                            </div>`;
-                    });
-                }
+            categories.forEach(cat => {
+                const list = giftProducts[cat.id] || [];
+                list.forEach(g => {
+                    totalCount++;
+                    container.innerHTML += `
+                        <div class="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 hover:bg-gray-100 transition">
+                            <img src="${g.image}" alt="${g.name}" class="w-12 h-12 rounded-md object-cover border border-gray-300 flex-shrink-0 cursor-pointer hover:opacity-80" onclick="openEditGiftModal('${cat.id}', ${g.id})" title="Clique para editar" onerror="this.src='https://via.placeholder.com/60?text=Foto'">
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-gray-800 truncate">${g.name}</div>
+                                <div class="text-xs text-indigo-600 font-medium">${cat.title}</div>
+                                ${g.desc ? `<div class="text-xs text-gray-500 truncate">${g.desc}</div>` : ''}
+                            </div>
+                            <div class="flex items-center gap-1 flex-shrink-0">
+                                <button class="text-indigo-600 hover:text-indigo-800 p-2 rounded hover:bg-indigo-50 transition font-bold" title="Editar textos e categoria" onclick="openEditGiftModal('${cat.id}', ${g.id})">
+                                    ✏️
+                                </button>
+                                <button class="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition font-bold" title="Excluir brinde" onclick="removeGift('${cat.id}', ${g.id})">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>`;
+                });
             });
 
             if (countBadge) countBadge.textContent = `${totalCount} ${totalCount === 1 ? 'item' : 'itens'}`;
@@ -1643,22 +1637,216 @@
             }
         }
 
-        function saveCategoryTitles() {
-            siteData.categoryTitles = {
-                executivos: document.getElementById('title-executivos-input').value.trim() || "Brindes Executivos",
-                sustentaveis: document.getElementById('title-sustentaveis-input').value.trim() || "Brindes Sustentáveis",
-                tecnologicos: document.getElementById('title-tecnologicos-input').value.trim() || "Brindes Tecnológicos"
+        // ==========================================
+        // GERENCIAMENTO DE CARROSSÉIS DINÂMICOS
+        // ==========================================
+        function renderAdminCategoriesList() {
+            const container = document.getElementById('admin-categories-list');
+            const countBadge = document.getElementById('admin-categories-count');
+            if (!container) return;
+
+            const categories = getCategoriesList();
+            container.innerHTML = '';
+
+            if (countBadge) countBadge.textContent = `${categories.length} ${categories.length === 1 ? 'carrossel' : 'carrosséis'}`;
+
+            if (categories.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-xs text-gray-400">Nenhum carrossel cadastrado.</div>`;
+                return;
+            }
+
+            categories.forEach((cat, index) => {
+                const giftsCount = (giftProducts[cat.id] || []).length;
+                const isFirst = index === 0;
+                const isLast = index === categories.length - 1;
+
+                container.innerHTML += `
+                    <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between gap-3 text-sm">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-xs font-bold bg-gray-200 text-gray-700 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
+                                ${index + 1}
+                            </span>
+                            <div class="min-w-0">
+                                <div class="font-bold text-gray-800 text-xs sm:text-sm truncate">${cat.title}</div>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-medium">${cat.tag}</span>
+                                    <span class="text-[10px] text-gray-400">(${giftsCount} ${giftsCount === 1 ? 'brinde' : 'brindes'})</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button class="p-1 text-xs text-gray-600 hover:text-gray-900 rounded hover:bg-gray-200 disabled:opacity-20 disabled:cursor-not-allowed" title="Mover para cima" onclick="moveCategory('${cat.id}', -1)" ${isFirst ? 'disabled' : ''}>
+                                ▲
+                            </button>
+                            <button class="p-1 text-xs text-gray-600 hover:text-gray-900 rounded hover:bg-gray-200 disabled:opacity-20 disabled:cursor-not-allowed" title="Mover para baixo" onclick="moveCategory('${cat.id}', 1)" ${isLast ? 'disabled' : ''}>
+                                ▼
+                            </button>
+                            <button class="p-1 text-xs text-indigo-600 hover:text-indigo-800 rounded hover:bg-indigo-50 font-bold" title="Editar carrossel" onclick="openEditCategoryModal('${cat.id}')">
+                                ✏️
+                            </button>
+                            <button class="p-1 text-xs text-red-500 hover:text-red-700 rounded hover:bg-red-50 font-bold" title="Excluir carrossel" onclick="removeCategory('${cat.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addCategory() {
+            const titleInput = document.getElementById('new-cat-title-input');
+            const tagInput = document.getElementById('new-cat-tag-input');
+
+            const title = titleInput.value.trim();
+            const tag = tagInput.value.trim() || 'Destaque';
+
+            if (!title) {
+                showToast('Digite o título do carrossel!', 'error');
+                titleInput.focus();
+                return;
+            }
+
+            const categories = getCategoriesList();
+            
+            // Gera um ID único e limpo
+            let baseSlug = title.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+                
+            if (!baseSlug) baseSlug = 'carrossel';
+            
+            let newId = baseSlug;
+            let counter = 1;
+            while (categories.some(c => c.id === newId) || (giftProducts && giftProducts[newId])) {
+                newId = `${baseSlug}_${counter++}`;
+            }
+
+            const newCategory = {
+                id: newId,
+                title: title,
+                tag: tag
             };
-            siteData.categoryTags = {
-                executivos: document.getElementById('tag-executivos-input').value.trim() || "Linha Executiva",
-                sustentaveis: document.getElementById('tag-sustentaveis-input').value.trim() || "Ecológico / PLA",
-                tecnologicos: document.getElementById('tag-tecnologicos-input').value.trim() || "Tecnologia & Inovação"
-            };
-            updateTitles();
+
+            categories.push(newCategory);
+            siteData.categories = categories;
+
+            if (!giftProducts[newId]) {
+                giftProducts[newId] = [];
+            }
+            activeSlides[newId] = 0;
+
+            syncLegacyCategoryMaps();
+
+            titleInput.value = '';
+            tagInput.value = '';
+
             pushDataToCloud();
+            renderAllCarousels();
+            renderAdminCategoriesList();
+            updateCategorySelect();
+
+            showToast(`Carrossel "${title}" criado com sucesso!`);
+        }
+
+        function removeCategory(catId) {
+            const categories = getCategoriesList();
+            const cat = categories.find(c => c.id === catId);
+            if (!cat) return;
+
+            const giftsCount = (giftProducts[catId] || []).length;
+            let confirmMsg = `Tem certeza que deseja excluir o carrossel "${cat.title}"?`;
+            if (giftsCount > 0) {
+                confirmMsg += `\n\n⚠️ Atenção: Há ${giftsCount} brinde(s) vinculado(s) a ele. Eles também serão excluídos!`;
+            }
+
+            if (!confirm(confirmMsg)) return;
+
+            siteData.categories = categories.filter(c => c.id !== catId);
+            delete giftProducts[catId];
+            delete activeSlides[catId];
+
+            syncLegacyCategoryMaps();
+
+            pushDataToCloud();
+            renderAllCarousels();
+            renderGiftsList();
+            updateCategorySelect();
+            renderAdminCategoriesList();
+
+            showToast(`Carrossel "${cat.title}" excluído!`);
+        }
+
+        function moveCategory(catId, direction) {
+            const categories = getCategoriesList();
+            const index = categories.findIndex(c => c.id === catId);
+            if (index === -1) return;
+
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= categories.length) return;
+
+            const temp = categories[index];
+            categories[index] = categories[newIndex];
+            categories[newIndex] = temp;
+
+            siteData.categories = categories;
+            syncLegacyCategoryMaps();
+
+            pushDataToCloud();
+            renderAllCarousels();
+            renderAdminCategoriesList();
+            updateCategorySelect();
+        }
+
+        let currentEditCatId = null;
+
+        function openEditCategoryModal(catId) {
+            const categories = getCategoriesList();
+            const cat = categories.find(c => c.id === catId);
+            if (!cat) return;
+
+            currentEditCatId = catId;
+            document.getElementById('edit-cat-title-input').value = cat.title || '';
+            document.getElementById('edit-cat-tag-input').value = cat.tag || '';
+            document.getElementById('edit-category-modal').classList.add('active');
+        }
+
+        function closeEditCategoryModal() {
+            const modal = document.getElementById('edit-category-modal');
+            if (modal) modal.classList.remove('active');
+            currentEditCatId = null;
+        }
+
+        function saveCategoryEdit() {
+            if (!currentEditCatId) return;
+
+            const categories = getCategoriesList();
+            const cat = categories.find(c => c.id === currentEditCatId);
+            if (!cat) return;
+
+            const title = document.getElementById('edit-cat-title-input').value.trim();
+            const tag = document.getElementById('edit-cat-tag-input').value.trim() || 'Destaque';
+
+            if (!title) {
+                showToast('O título do carrossel é obrigatório!', 'error');
+                return;
+            }
+
+            cat.title = title;
+            cat.tag = tag;
+            siteData.categories = categories;
+
+            syncLegacyCategoryMaps();
+
+            pushDataToCloud();
+            renderAllCarousels();
+            renderAdminCategoriesList();
             updateCategorySelect();
             renderGiftsList();
-            showToast("Títulos e tags salvos com sucesso!");
+
+            closeEditCategoryModal();
+            showToast('Carrossel atualizado com sucesso!');
         }
 
         function saveHeroContent() { 
