@@ -505,6 +505,7 @@
                 <button id="btn-add-gift" class="btn btn-primary w-full shadow" onclick="addGift()">
                     Adicionar ao Carrossel
                 </button>
+                <div id="gift-status" class="hidden mt-3 text-xs rounded-lg p-3 border" style="word-break:break-word;"></div>
             </div>
 
             <!-- Bloco 2: Lista de Brindes Cadastrados (Gerenciamento) -->
@@ -944,13 +945,12 @@
             // Tenta upload via Supabase Storage
             if (supabaseClient) {
                 try {
-                    const { data, error } = await supabaseClient.storage
+                    const { data, error } = await withTimeout(supabaseClient.storage
                         .from('brindes')
                         .upload(cleanName, optimizedFile, {
                             contentType: optimizedFile.type || 'image/webp',
-                            cacheControl: '3600',
-                            upsert: true
-                        });
+                            cacheControl: '3600'
+                        }), 30000, 'Upload da foto');
 
                     if (!error && data) {
                         const { data: pubData } = supabaseClient.storage
@@ -959,8 +959,9 @@
                         if (pubData && pubData.publicUrl) {
                             const reachable = await new Promise(res => {
                                 const t = new Image();
-                                t.onload = () => res(true);
-                                t.onerror = () => res(false);
+                                const to = setTimeout(() => res(false), 8000);
+                                t.onload = () => { clearTimeout(to); res(true); };
+                                t.onerror = () => { clearTimeout(to); res(false); };
                                 t.src = pubData.publicUrl;
                             });
                             if (reachable) return pubData.publicUrl;
@@ -973,12 +974,14 @@
                     }
                 } catch (storageError) {
                     console.warn("Falha de conexão com Storage:", storageError);
+                    showToast("Storage falhou (" + (storageError.message || storageError) + ") — foto salva direto no banco.", "error");
                 }
             }
 
-            // Fallback resiliente: salva a imagem comprimida diretamente no banco de dados
-            console.log("Armazenando imagem otimizada de forma resiliente...");
-            return await fileToDataURL(optimizedFile);
+            // Fallback: salva direto no banco, mas bem reduzida para não estourar o tamanho do envio
+            console.log("Armazenando imagem reduzida direto no banco (Storage indisponível)...");
+            const tiny = await compressImageFile(file, 800, 800, 0.7);
+            return await fileToDataURL(tiny);
         }
 
         // ==========================================
@@ -1026,6 +1029,7 @@
                     loadFallbacks(); 
                 }
             } catch (error) {
+                lastCloudError = String(error.message || error);
                 console.error("Erro ao carregar dados da nuvem:", error);
                 loadFallbacks();
             }
@@ -1033,41 +1037,95 @@
             updateFrontend();
         }
 
+        let lastCloudError = '';
+
+        function setGiftStatus(msg, type) {
+            const el = document.getElementById('gift-status');
+            if (!el) return;
+            const styles = {
+                info:    'background:#eff6ff;border-color:#bfdbfe;color:#1e40af;',
+                success: 'background:#ecfdf5;border-color:#a7f3d0;color:#065f46;',
+                error:   'background:#fef2f2;border-color:#fecaca;color:#991b1b;'
+            };
+            el.setAttribute('style', 'word-break:break-word;' + (styles[type] || styles.info));
+            el.classList.remove('hidden');
+            el.textContent = msg;
+        }
+
+        function withTimeout(promise, ms, label) {
+            return Promise.race([
+                promise,
+                new Promise((_, rej) => setTimeout(() => rej(new Error(label + ' demorou mais de ' + Math.round(ms/1000) + 's')), ms))
+            ]);
+        }
+
         let cloudLoadedOk = false; // evita sobrescrever o banco com dados vazios se o carregamento falhar
 
         async function pushDataToCloud() {
             if (!cloudLoadedOk) {
-                console.error("Gravação bloqueada: os dados da nuvem não foram carregados com sucesso.");
+                lastCloudError = "Os dados da nuvem não carregaram ao abrir a página (" + (lastCloudError || 'erro ao ler a tabela site_config') + "). Por segurança nada foi gravado.";
+                console.error("Gravação bloqueada:", lastCloudError);
                 showToast("Não foi possível salvar: dados da nuvem não carregaram. Recarregue a página.", "error");
                 return false;
             }
-            try {
-                const response = await fetch(`${SUPABASE_URL}site_config?on_conflict=id`, {
-                    method: "POST",
-                    headers: { 
-                        "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${SUPABASE_KEY}`,
-                        "Content-Type": "application/json",
-                        "Prefer": "return=minimal, resolution=merge-duplicates"
-                    },
-                    body: JSON.stringify({ 
-                        id: 1, 
-                        site_data: siteData, 
-                        gift_products: giftProducts 
-                    })
-                });
 
-                if (!response.ok) {
-                    let detail = '';
-                    try { detail = await response.text(); } catch (_) {}
-                    throw new Error(`HTTP ${response.status} ${detail}`);
+            const bodyStr = JSON.stringify({ id: 1, site_data: siteData, gift_products: giftProducts });
+            const sizeMB = (bodyStr.length / 1048576);
+            const sizeTxt = sizeMB.toFixed(2) + " MB";
+            const inlineImgs = Object.values(giftProducts).flat().filter(g => g && typeof g.image === 'string' && g.image.startsWith('data:')).length;
+            console.log(`Enviando ${sizeTxt} para a nuvem (${inlineImgs} foto(s) embutidas no banco).`);
+
+            const MAX_TRIES = 3;
+            for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+                try {
+                    lastCloudError = '';
+                    const ctrl = new AbortController();
+                    const tm = setTimeout(() => ctrl.abort(), 30000);
+                    let response;
+                    try {
+                        response = await fetch(`${SUPABASE_URL}site_config?on_conflict=id`, {
+                            method: "POST",
+                            signal: ctrl.signal,
+                            keepalive: false,
+                            headers: { 
+                                "apikey": SUPABASE_KEY,
+                                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                                "Content-Type": "application/json",
+                                "Prefer": "return=minimal, resolution=merge-duplicates"
+                            },
+                            body: bodyStr
+                        });
+                    } finally {
+                        clearTimeout(tm);
+                    }
+
+                    if (!response.ok) {
+                        let detail = '';
+                        try { detail = await response.text(); } catch (_) {}
+                        // Erro HTTP é resposta do servidor: tentar de novo não adianta
+                        lastCloudError = `HTTP ${response.status} ${detail}`;
+                        console.error("Erro ao sincronizar com nuvem:", lastCloudError);
+                        showToast("NÃO salvou na nuvem: " + lastCloudError.slice(0, 220), "error");
+                        return false;
+                    }
+                    return true;
+                } catch (error) {
+                    // Falha de rede (ex.: "The network connection was lost" no Safari)
+                    console.warn(`Tentativa ${attempt}/${MAX_TRIES} falhou:`, error);
+                    if (attempt < MAX_TRIES) {
+                        setGiftStatus(`⚠️ Conexão caiu ao salvar (${sizeTxt}). Tentando de novo (${attempt + 1}/${MAX_TRIES})...`, "info");
+                        await new Promise(r => setTimeout(r, 1500 * attempt));
+                        continue;
+                    }
+                    const motivo = error.name === 'AbortError' ? 'tempo esgotado (30s)' : (error.message || String(error));
+                    lastCloudError = `a conexão caiu ${MAX_TRIES}x (${motivo}). Tamanho do envio: ${sizeTxt}` +
+                        (inlineImgs ? `, com ${inlineImgs} foto(s) guardadas dentro do banco — isso deixa o envio pesado; o ideal é as fotos irem para o Storage.` : '.');
+                    console.error("Erro ao sincronizar com nuvem:", error);
+                    showToast("NÃO salvou na nuvem: " + lastCloudError.slice(0, 220), "error");
+                    return false;
                 }
-                return true;
-            } catch (error) {
-                console.error("Erro ao sincronizar com nuvem:", error);
-                showToast("NÃO salvou na nuvem: " + String(error.message || error).slice(0, 220), "error");
-                return false;
             }
+            return false;
         }
 
         function loadFallbacks() {
@@ -1437,6 +1495,19 @@
 
         // Adicionar novo brinde com upload persistente
         async function addGift() {
+            const btn = document.getElementById('btn-add-gift');
+            try {
+                await addGiftInner();
+            } catch (err) {
+                console.error("Erro inesperado em addGift:", err);
+                setGiftStatus("❌ Erro inesperado: " + (err && err.message ? err.message : err), "error");
+                showToast("Erro inesperado: " + (err && err.message ? err.message : err), "error");
+                if (btn) { btn.disabled = false; btn.innerHTML = `Adicionar ao Carrossel`; }
+            }
+        }
+
+        async function addGiftInner() {
+            setGiftStatus("⏳ Processando...", "info");
             const nameInput = document.getElementById('gift-name-input');
             const descInput = document.getElementById('gift-desc-input');
             const categorySelect = document.getElementById('gift-category-input');
@@ -1447,6 +1518,7 @@
             const category = categorySelect.value;
 
             if (!name) { 
+                setGiftStatus("⚠️ Digite o nome do brinde.", "error");
                 showToast("Digite o nome do brinde!", "error"); 
                 nameInput.focus();
                 return; 
@@ -1458,6 +1530,7 @@
             if (activeImageSource === 'file') {
                 const fileInput = document.getElementById('gift-file-input');
                 if (!fileInput.files || !fileInput.files[0]) {
+                    setGiftStatus("⚠️ Selecione uma imagem para o brinde.", "error");
                     showToast("Selecione uma imagem para o brinde!", "error");
                     return;
                 }
@@ -1516,7 +1589,12 @@
             renderGiftsList(); 
             renderAllCarousels(); 
             const saved = await pushDataToCloud();
-            if (saved) showToast("Brinde adicionado e salvo na nuvem!");
+            if (saved) {
+                setGiftStatus("✅ Foto adicionada e salva na nuvem.", "success");
+                showToast("Brinde adicionado e salvo na nuvem!");
+            } else {
+                setGiftStatus("❌ A foto aparece aqui, mas NÃO foi salva na nuvem. Motivo: " + lastCloudError, "error");
+            }
         }
 
         function removeGift(category, id) {
@@ -1980,7 +2058,7 @@
                 t.style.opacity = '0';
                 t.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => t.remove(), 300);
-            }, 3000); 
+            }, type === "error" ? 9000 : 3000); 
         }
     </script>
 </body>
