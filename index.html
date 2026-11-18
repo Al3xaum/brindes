@@ -957,10 +957,19 @@
                             .from('brindes')
                             .getPublicUrl(cleanName);
                         if (pubData && pubData.publicUrl) {
-                            return pubData.publicUrl;
+                            const reachable = await new Promise(res => {
+                                const t = new Image();
+                                t.onload = () => res(true);
+                                t.onerror = () => res(false);
+                                t.src = pubData.publicUrl;
+                            });
+                            if (reachable) return pubData.publicUrl;
+                            console.warn("A foto subiu, mas a URL pública não abre. O bucket 'brindes' precisa estar marcado como Public.");
+                            showToast("Bucket 'brindes' não está público — foto salva direto no banco.", "error");
                         }
                     } else if (error) {
                         console.warn("Aviso do Supabase Storage:", error.message || error);
+                        showToast("Storage recusou o upload (" + (error.message || 'erro') + ") — foto salva direto no banco.", "error");
                     }
                 } catch (storageError) {
                     console.warn("Falha de conexão com Storage:", storageError);
@@ -994,6 +1003,8 @@
 
                 const data = await response.json();
                     
+                cloudLoadedOk = true;
+
                 if (data && data.length > 0) {
                     siteData = data[0].site_data || {};
                     let dbGifts = data[0].gift_products;
@@ -1022,9 +1033,16 @@
             updateFrontend();
         }
 
+        let cloudLoadedOk = false; // evita sobrescrever o banco com dados vazios se o carregamento falhar
+
         async function pushDataToCloud() {
+            if (!cloudLoadedOk) {
+                console.error("Gravação bloqueada: os dados da nuvem não foram carregados com sucesso.");
+                showToast("Não foi possível salvar: dados da nuvem não carregaram. Recarregue a página.", "error");
+                return false;
+            }
             try {
-                const response = await fetch(`${SUPABASE_URL}site_config`, {
+                const response = await fetch(`${SUPABASE_URL}site_config?on_conflict=id`, {
                     method: "POST",
                     headers: { 
                         "apikey": SUPABASE_KEY,
@@ -1040,11 +1058,15 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Erro status: ${response.status}`);
+                    let detail = '';
+                    try { detail = await response.text(); } catch (_) {}
+                    throw new Error(`HTTP ${response.status} ${detail}`);
                 }
+                return true;
             } catch (error) {
                 console.error("Erro ao sincronizar com nuvem:", error);
-                showToast("Erro ao sincronizar com a nuvem", "error");
+                showToast("NÃO salvou na nuvem (só aparece neste navegador). Veja o console (F12).", "error");
+                return false;
             }
         }
 
@@ -1212,6 +1234,27 @@
             });
         }
 
+        function escHTML(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Placeholder embutido (não depende de site externo) para fotos que falharem ao carregar
+        const BROKEN_IMG_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="40">🖼️</text><text x="50%" y="66%" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#6b7280">Foto indisponível</text></svg>'
+        );
+
+        function openGiftLightbox(category, id) {
+            const g = (giftProducts[category] || []).find(x => x.id === id);
+            if (g) openImageLightbox(g.image, g.name, g.desc || '');
+        }
+
+        function quoteGiftById(category, id) {
+            const g = (giftProducts[category] || []).find(x => x.id === id);
+            if (g) requestGiftQuote(g.name);
+        }
+
         function renderCarousel(category) {
             const list = giftProducts[category] || [];
             const container = document.getElementById(`carousel-${category}-container`);
@@ -1236,33 +1279,37 @@
                 activeSlides[category] = 0;
             }
 
+            let slidesHTML = '';
+            let dotsHTML = '';
+
             list.forEach((g, idx) => {
                 const isActive = idx === activeSlides[category];
-                container.innerHTML += `
+                slidesHTML += `
                     <div class="carousel-item ${isActive ? 'active' : ''}">
                         <div class="flex flex-col items-center justify-between w-full h-full p-4 sm:p-6 text-center">
                             <div class="flex-1 flex items-center justify-center w-full overflow-hidden my-auto">
-                                <div class="relative group cursor-pointer inline-block" onclick="openImageLightbox('${g.image.replace(/'/g, "\\'")}', '${g.name.replace(/'/g, "\\'")}', '${(g.desc || '').replace(/'/g, "\\'")}')" title="Clique para ampliar a foto">
-                                    <img src="${g.image}" alt="${g.name}" class="rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-[1.03]" style="max-height: 250px; max-width: 100%; object-fit: contain;">
+                                <div class="relative group cursor-pointer inline-block" onclick="openGiftLightbox('${category}', ${Number(g.id)})" title="Clique para ampliar a foto">
+                                    <img src="${escHTML(g.image)}" alt="${escHTML(g.name)}" class="rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-[1.03]" style="max-height: 250px; max-width: 100%; object-fit: contain;" onerror="this.onerror=null; this.src=BROKEN_IMG_SVG;">
                                     <span class="zoom-badge">
                                         <span>🔍</span> <span>Ampliar</span>
                                     </span>
                                 </div>
                             </div>
                             <div class="mt-3 w-full">
-                                <h4 class="font-bold text-lg text-gray-900">${g.name}</h4>
-                                ${g.desc ? `<p class="text-sm text-gray-600 mt-1 max-w-md mx-auto line-clamp-2">${g.desc}</p>` : ''}
-                                <button onclick="requestGiftQuote('${g.name.replace(/'/g, "\\'")}')" class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-full transition shadow-sm">
+                                <h4 class="font-bold text-lg text-gray-900">${escHTML(g.name)}</h4>
+                                ${g.desc ? `<p class="text-sm text-gray-600 mt-1 max-w-md mx-auto line-clamp-2">${escHTML(g.desc)}</p>` : ''}
+                                <button onclick="quoteGiftById('${category}', ${Number(g.id)})" class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-full transition shadow-sm">
                                     <span>💬 Pedir orçamento deste brinde</span>
                                 </button>
                             </div>
                         </div>
                     </div>`;
-                
-                dotsContainer.innerHTML += `
-                    <button aria-label="Slide ${idx + 1}" class="dot ${isActive ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>
-                `;
+
+                dotsHTML += `<button aria-label="Slide ${idx + 1}" class="dot ${isActive ? 'active' : ''}" onclick="goToSlide('${category}', ${idx})"></button>`;
             });
+
+            container.innerHTML = slidesHTML;
+            dotsContainer.innerHTML = dotsHTML;
         }
 
         function changeSlide(category, direction) {
@@ -1468,8 +1515,8 @@
             // Atualiza UI e sincroniza com a nuvem
             renderGiftsList(); 
             renderAllCarousels(); 
-            pushDataToCloud();
-            showToast("Brinde adicionado com sucesso!");
+            const saved = await pushDataToCloud();
+            if (saved) showToast("Brinde adicionado e salvo na nuvem!");
         }
 
         function removeGift(category, id) {
@@ -1613,11 +1660,11 @@
                     totalCount++;
                     container.innerHTML += `
                         <div class="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 hover:bg-gray-100 transition">
-                            <img src="${g.image}" alt="${g.name}" class="w-12 h-12 rounded-md object-cover border border-gray-300 flex-shrink-0 cursor-pointer hover:opacity-80" onclick="openEditGiftModal('${cat.id}', ${g.id})" title="Clique para editar" onerror="this.src='https://via.placeholder.com/60?text=Foto'">
+                            <img src="${escHTML(g.image)}" alt="${escHTML(g.name)}" class="w-12 h-12 rounded-md object-cover border border-gray-300 flex-shrink-0 cursor-pointer hover:opacity-80" onclick="openEditGiftModal('${cat.id}', ${g.id})" title="Clique para editar" onerror="this.src='https://via.placeholder.com/60?text=Foto'">
                             <div class="flex-1 min-w-0">
-                                <div class="font-bold text-gray-800 truncate">${g.name}</div>
+                                <div class="font-bold text-gray-800 truncate">${escHTML(g.name)}</div>
                                 <div class="text-xs text-indigo-600 font-medium">${cat.title}</div>
-                                ${g.desc ? `<div class="text-xs text-gray-500 truncate">${g.desc}</div>` : ''}
+                                ${g.desc ? `<div class="text-xs text-gray-500 truncate">${escHTML(g.desc)}</div>` : ''}
                             </div>
                             <div class="flex items-center gap-1 flex-shrink-0">
                                 <button class="text-indigo-600 hover:text-indigo-800 p-2 rounded hover:bg-indigo-50 transition font-bold" title="Editar textos e categoria" onclick="openEditGiftModal('${cat.id}', ${g.id})">
