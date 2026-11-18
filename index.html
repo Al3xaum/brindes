@@ -1065,7 +1065,7 @@
                 return true;
             } catch (error) {
                 console.error("Erro ao sincronizar com nuvem:", error);
-                showToast("NÃO salvou na nuvem (só aparece neste navegador). Veja o console (F12).", "error");
+                showToast("NÃO salvou na nuvem: " + String(error.message || error).slice(0, 220), "error");
                 return false;
             }
         }
